@@ -31,12 +31,15 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.YC_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.YC_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ru-central1
+          # новые версии AWS CLI шлют контрольные суммы, которые Yandex Object Storage не принимает
+          AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+          AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
           S3: aws s3 --endpoint-url=https://storage.yandexcloud.net
           BUCKET: s3://koshelek
         run: |
           set -e
           # картинки — с долгим кэшем
-          $S3 sync . $BUCKET --exclude "*" --include "*.png" --cache-control "public,max-age=604800"
+          for f in *.png; do $S3 cp "$f" "$BUCKET/$f" --content-type "image/png" --cache-control "public,max-age=604800"; done
           # манифест — с правильным типом
           $S3 cp manifest.webmanifest $BUCKET/manifest.webmanifest --content-type "application/manifest+json" --cache-control "no-cache"
           # страница и офлайн-скрипт — без кэша, чтобы обновления приходили сразу
