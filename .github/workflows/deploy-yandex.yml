@@ -28,21 +28,20 @@ jobs:
 
       - name: Загрузка в хранилище
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.YC_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.YC_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ru-central1
-          # новые версии AWS CLI шлют контрольные суммы, которые Yandex Object Storage не принимает
-          AWS_REQUEST_CHECKSUM_CALCULATION: when_required
-          AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
-          S3: aws s3 --endpoint-url=https://storage.yandexcloud.net
-          BUCKET: s3://koshelek
+          KEY_ID: ${{ secrets.YC_ACCESS_KEY_ID }}
+          KEY_SECRET: ${{ secrets.YC_SECRET_ACCESS_KEY }}
         run: |
           set -e
-          # картинки — с долгим кэшем
-          for f in *.png; do $S3 cp "$f" "$BUCKET/$f" --content-type "image/png" --cache-control "public,max-age=604800"; done
-          # манифест — с правильным типом
-          $S3 cp manifest.webmanifest $BUCKET/manifest.webmanifest --content-type "application/manifest+json" --cache-control "no-cache"
-          # страница и офлайн-скрипт — без кэша, чтобы обновления приходили сразу
-          $S3 cp sw.js $BUCKET/sw.js --content-type "text/javascript; charset=utf-8" --cache-control "no-cache"
-          $S3 cp index.html $BUCKET/index.html --content-type "text/html; charset=utf-8" --cache-control "no-cache"
+          up() { # файл, тип, кэш
+            code=$(curl -sS -o /tmp/resp.txt -w "%{http_code}" --aws-sigv4 "aws:amz:ru-central1:s3" \
+              --user "$(echo -n "$KEY_ID" | tr -d '[:space:]'):$(echo -n "$KEY_SECRET" | tr -d '[:space:]')" \
+              -H "Content-Type: $2" -H "Cache-Control: $3" -T "$1" \
+              "https://storage.yandexcloud.net/koshelek/$1")
+            if [ "$code" != "200" ]; then echo "::error::$1 → HTTP $code"; cat /tmp/resp.txt; exit 1; fi
+            echo "✓ $1"
+          }
+          for f in *.png; do up "$f" "image/png" "public,max-age=604800"; done
+          up manifest.webmanifest "application/manifest+json" "no-cache"
+          up sw.js "text/javascript; charset=utf-8" "no-cache"
+          up index.html "text/html; charset=utf-8" "no-cache"
           echo "Готово: https://koshelek.website.yandexcloud.net"
