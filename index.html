@@ -485,7 +485,11 @@ body .aib{display:grid} body .aicard{display:block}
 <!-- трата -->
 <div class="sheet" id="shSpend">
   <div class="grabz"><div class="grab"></div></div>
-  <h4>Новая трата <button class="x" data-close>✕</button></h4>
+  <h4>Новая трата <span style="display:flex;gap:8px;align-items:center"><button class="chip" id="smsBtn" style="font-size:13px;padding:7px 11px">📋 Из SMS</button><button class="x" data-close>✕</button></span></h4>
+  <div class="hidden" id="smsBox" style="margin-bottom:12px">
+    <textarea class="inp" id="smsTa" rows="3" placeholder="Вставьте сюда текст SMS от банка" style="resize:none;font-size:14px"></textarea>
+    <button class="btn soft sm" id="smsParse" style="margin-top:8px">Разобрать SMS</button>
+  </div>
   <div class="amtbox"><div class="v" id="kpV">0<span class="cur"> ₽</span></div><div class="h" id="kpH"></div></div>
   <div class="hscroll" id="spCats"></div>
   <div class="hscroll" id="spDays"></div>
@@ -560,6 +564,19 @@ body .aib{display:grid} body .aicard{display:block}
     <div class="field"><label>Семейный код</label><input class="inp" id="codeIn" placeholder="необязательно" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
     <button class="btn sm" id="keySave">Сохранить и проверить</button>
     <div class="keyok hidden" id="keyOk">✓ GigaChat подключён</div>
+  </div>
+  <div class="setsec">
+    <h5>📩 Траты из SMS банка</h5>
+    <p>Если банк присылает SMS о покупках, iPhone может сам копировать их — а вы добавите трату одним нажатием «📋 Из SMS».</p>
+    <details><summary>Как настроить (2 минуты)</summary>
+      <p><b>1.</b> Откройте приложение <b>«Команды»</b> → вкладка <b>«Автоматизация»</b> → <b>«+»</b> → <b>«Сообщение»</b>.</p>
+      <p><b>2.</b> «Отправитель» — выберите номер банка (Сбер — <b>900</b>, Т-Банк — <b>Tinkoff</b> или <b>T-Bank</b>, Альфа — <b>Alfa-Bank</b>, ВТБ — <b>VTB</b>). «Сообщение содержит» — можно оставить пустым.</p>
+      <p><b>3.</b> Выберите <b>«Запускать немедленно»</b> → «Далее» → «Новая пустая команда».</p>
+      <p><b>4.</b> Добавьте действие <b>«Скопировать в буфер обмена»</b> и в нём выберите <b>«Ввод быстрой команды»</b> (текст сообщения).</p>
+      <p><b>5.</b> По желанию добавьте <b>«Показать уведомление»</b> с текстом «Трата скопирована — открой Кошелёк». Готово.</p>
+      <p>Пришла SMS → откройте «Кошелёк» → «+» → <b>«📋 Из SMS»</b> → проверьте → «Сохранить». Можно и без команды: скопируйте SMS вручную.</p>
+    </details>
+    <button class="btn soft sm" id="smsDemo" style="margin-top:10px">Попробовать на примере</button>
   </div>
   <div class="setsec">
     <h5>👨‍👩‍👧 Поделиться с близкими</h5>
@@ -885,7 +902,7 @@ function paintDays(){const t=new Date(),y=new Date();y.setDate(t.getDate()-1);
 $("spDays").onclick=e=>{const b=e.target.closest("[data-d]");if(!b)return;spDay=b.dataset.d;
   if(spDay==="pick"&&!$("spDate").value)$("spDate").value=ymd(today);paintDays();if(spDay==="pick")try{$("spDate").showPicker()}catch(_){}};
 $("spDate").onchange=paintDays;
-$("fab").onclick=()=>{kp="";$("spNote").value="";
+$("fab").onclick=()=>{kp="";$("spNote").value="";pendingSms=null;$("smsBox").classList.add("hidden");
   const isCur=ym(cur)===ym(today);
   if(vi===2&&selDay!==ymd(today)){spDay="pick";$("spDate").value=selDay}else if(isCur){spDay="today"}else{spDay="pick";$("spDate").value=ym(cur)+"-01"}
   paintCats();paintDays();paintKp();openSheet("shSpend")};
@@ -894,6 +911,7 @@ $("spSave").onclick=()=>{const a=num(kp);
   let date=ymd(today);if(spDay==="yday"){const d=new Date();d.setDate(d.getDate()-1);date=ymd(d)}else if(spDay==="pick")date=$("spDate").value||date;
   const k=date.slice(0,7);
   (state.months[k]=state.months[k]||[]).push({id:uid(),date,amount:Math.round(a*100)/100,cat:spCat,note:$("spNote").value.trim().slice(0,80),t:Date.now()});
+  if(pendingSms){smsMarkSeen(pendingSms);pendingSms=null}
   saveMonth(k);closeSheet();const [yy,mm]=k.split("-").map(Number);cur=new Date(yy,mm-1,1);render();toast("Записано: "+money(a)+" "+CAT[spCat][1])};
 document.addEventListener("keydown",e=>{if(!sheet||sheet.id!=="shSpend"||e.target.tagName==="INPUT")return;
   if(/^[0-9]$/.test(e.key)){$('[data-k="'+e.key+'"]').click()}else if(e.key==="Backspace")$('[data-k="⌫"]').click();
@@ -1207,6 +1225,83 @@ $("wipe").onclick=()=>{if(Date.now()-wipeArm>3000){wipeArm=Date.now();$("wipe").
   const prev=state;state={plans:[],months:{},goals:[]};seen.clear();saveLocal();$("wipe").textContent="Удалить все данные";closeSheet();render();
   toast("Все данные удалены",()=>{state=prev;saveLocal();render()})};
 if("serviceWorker" in navigator&&/^https?:$/.test(location.protocol))addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+
+// ---------- траты из SMS банка ----------
+const MERCH_CATS=[
+  ["food",/пят[её]роч|pyaterochk|магнит|magnit|перекр[её]ст|perekrest|лента|lenta|ашан|auchan|дикси|dixy|вкусвилл|vkusvill|spar|спар|metro|метро кэш|окей|okey|окей|красное.?белое|krasnoe|бристоль|bristol|монетк|monetk|светофор|fix ?price|фикс прайс|самокат|samokat|лавка|lavka|продукт|grocery|market|маркет/i],
+  ["cafe",/кафе|cafe|caf[eé]|кофе|coffee|кофейн|ресторан|restoran|restaurant|бургер|burger|kfc|rostic|ростикс|вкусно и точка|vkusno|додо|dodo|pizza|пицц|суши|sushi|роллы|шоколадниц|столов|stolovaya|еда|eda|delivery|доставк|teremok|теремок|subway|starbucks|cofix|кофикс/i],
+  ["transport",/такси|taxi|yandex\.?go|яндекс ?go|uber|ситимобил|metro|метрополит|транспорт|transport|тройка|troika|автобус|bus|ржд|rzd|аэрофлот|aeroflot|азс|azs|лукойл|lukoil|газпромнефть|gazpromneft|роснефть|rosneft|татнефть|shell|parking|парковк|каршер|делимобиль|delimobil|whoosh|юрент|самолет|авиа|aviasales/i],
+  ["health",/аптек|apteka|pharm|фарм|здоров|zdorov|клиник|clinic|стоматолог|dental|медиц|medic|invitro|инвитро|гемотест|лаборатор/i],
+  ["clothes",/lamoda|ламода|zara|h&m|hm |gloria|глория|befree|ostin|остин|sportmaster|спортмастер|обув|одежд|одеж|befree|uniqlo|love republic|zolla/i],
+  ["fun",/кино|cinema|kino|steam|playstation|xbox|nintendo|игр|game|театр|theatre|концерт|concert|кассир|kassir|ticketland|яндекс ?плюс|yandex ?plus|кинопоиск|kinopoisk|okko|ivi|spotify|музе|бар |bar |пиво|beer/i],
+  ["home",/мтс|mts|билайн|beeline|мегафон|megafon|tele2|теле2|yota|ростелеком|rostelecom|жкх|zhkh|коммунал|электроэнерг|водоканал|газ |леруа|leroy|икеа|ikea|hoff|хофф|obi|оби|домашн|хозтовар|интернет/i],
+  ["gifts",/цвет|flower|подар|gift|детский мир|toy/i],
+];
+function guessCat(t){for(const [c,re] of MERCH_CATS)if(re.test(t))return c;return "other"}
+const INCOME_RE=/зачислен|поступлен|пополнен|перевод от|получен перевод|зарплат|возврат|refund|cashback|кешб[эе]к|кэшб[эе]к/i;
+const SPEND_RE=/покупк|оплат|списан|pokupka|oplata|spisan|purchase|payment|снят|выдача|перевод\b|перевод на|перевод\s+\d|сбп/i;
+function parseBankSms(raw){
+  const t=String(raw||"").replace(/ /g," ").replace(/\s+/g," ").trim();
+  if(!t)return {err:"Пустой текст"};
+  const amtRe=/(\d{1,3}(?:[   ]\d{3})+|\d+)(?:[.,](\d{1,2}))?\s?(?:руб\.?|р\.?|rub|rur|₽)(?![а-яёa-z])/gi;
+  const all=[...t.matchAll(amtRe)];
+  if(!all.length)return {err:"Не нашёл сумму в тексте"};
+  // первая сумма, которая не после слов «баланс/доступно/остаток»
+  let m=all.find(x=>!/(баланс|доступно|остаток|balance|ostatok|dostupno)[:\s]*$/i.test(t.slice(Math.max(0,x.index-14),x.index)))||all[0];
+  const amount=parseFloat(m[1].replace(/[  ]/g,"")+(m[2]?"."+m[2]:""));
+  if(!(amount>0))return {err:"Не нашёл сумму"};
+  const isIncome=INCOME_RE.test(t)&&!/покупк|оплат|списан/i.test(t);
+  if(isIncome)return {income:true,amount};
+  if(!SPEND_RE.test(t)&&!/\*\d{4}|карт|card|mir|visa|mastercard/i.test(t))return {err:"Похоже, это не трата"};
+  // магазин: текст после суммы до «Баланс/Доступно/Остаток»
+  let after=t.slice(m.index+m[0].length).replace(/^[\s.,:;-]+/,"");
+  after=after.replace(/(?:карта|карты|card|счёт|счет)\s*\*?\d{4}|\*\d{4}|(?:mir|visa|mc|ecmc)-?\d{4}/gi," ").replace(/^[\s.,:;-]+/,"");
+  after=after.split(/(?:баланс|доступно|остаток|balance|ostatok|dostupno)/i)[0];
+  let merchant=after.replace(/["«»]/g,"").replace(/[.,;:\s-]+$/,"").trim();
+  if(!merchant||merchant.length<2){ // магазин мог быть до суммы (например, «Покупка в ПЯТЕРОЧКА 450р»)
+    const before=t.slice(0,m.index).replace(/^.*?(покупк\S*|оплат\S*|списан\S*)\s*(в|в магазине)?\s*/i,"").replace(/\d{2}:\d{2}|\d{2}\.\d{2}(\.\d{2,4})?|mir-?\d{4}|\*\d{4}|карт\S*/gi,"").trim();
+    merchant=before;
+  }
+  merchant=merchant.replace(/(\s+\d+)+$/,"").slice(0,40);
+  const cat=guessCat(merchant+" "+t);
+  const pretty=merchant?merchant.toLowerCase().replace(/(^|\s)\S/g,s=>s.toUpperCase()):"";
+  // дата из SMS (дд.мм) — если есть и не в будущем
+  let date=ymd(new Date());const dm=t.match(/\b(\d{2})\.(\d{2})(?:\.(\d{2,4}))?\b/);
+  if(dm){const now=new Date();let y=dm[3]?(+dm[3]<100?2000+ +dm[3]:+dm[3]):now.getFullYear();const d=new Date(y,+dm[2]-1,+dm[1]);
+    if(d<=now&&now-d<62*864e5&&d.getDate()===+dm[1])date=ymd(d)}
+  return {amount:Math.round(amount*100)/100,merchant:pretty,cat,date}}
+window.__parseSms=parseBankSms;
+const SMS_SEEN="koshelek.smsseen";
+function smsKey(t){let h=0;for(const c of String(t))h=(h*31+c.charCodeAt(0))|0;return String(h)}
+function smsWasSeen(t){try{return (JSON.parse(localStorage.getItem(SMS_SEEN)||"[]")).includes(smsKey(t))}catch(e){return false}}
+function smsMarkSeen(t){try{const a=JSON.parse(localStorage.getItem(SMS_SEEN)||"[]");a.push(smsKey(t));localStorage.setItem(SMS_SEEN,JSON.stringify(a.slice(-300)))}catch(e){}}
+let pendingSms=null;
+function fillFromSms(text){
+  const r=parseBankSms(text);
+  if(r.err){toast(r.err);return false}
+  if(r.income){toast("Это поступление "+money(r.amount)+" — траты не добавляю");return false}
+  const dup=smsWasSeen(text);
+  kp=String(r.amount).replace(".",",");spCat=r.cat;$("spNote").value=r.merchant;
+  if(r.date!==ymd(new Date())){spDay="pick";$("spDate").value=r.date}else spDay="today";
+  pendingSms=text;
+  if(!sheet||sheet.id!=="shSpend")openSheet("shSpend");
+  paintCats();paintDays();paintKp(true);
+  const b=$$("#spCats .chip.on")[0];if(b)b.scrollIntoView({inline:"center",block:"nearest"});
+  $("kpH").textContent=dup?"⚠️ Похоже, эту SMS вы уже добавляли":"Из SMS: проверьте и нажмите «Сохранить»";
+  return true}
+async function pasteSms(){
+  let text="";
+  try{text=await navigator.clipboard.readText()}catch(e){}
+  if(!text){$("smsBox").classList.remove("hidden");$("smsTa").focus();toast("Вставьте текст SMS в поле");return}
+  fillFromSms(text)}
+// ссылка вида #sms=<текст> (если «Кошелёк» открыт в Safari)
+(function(){const h=location.hash.slice(1);if(!/(^|&)sms=/.test(h))return;
+  const t=new URLSearchParams(h).get("sms")||"";try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}
+  if(t)setTimeout(()=>{if(fillFromSms(t)){}},500)})();
+
+$("smsBtn").onclick=pasteSms;
+$("smsParse").onclick=()=>{const t=$("smsTa").value;if(fillFromSms(t)){$("smsBox").classList.add("hidden");$("smsTa").value=""}};
+$("smsDemo").onclick=()=>{closeSheet();setTimeout(()=>fillFromSms("MIR-4417 14:32 Покупка 846.50р PYATEROCHKA 1234 Баланс: 23 410.12р"),300)};
 
 // toast
 let tt=null;
