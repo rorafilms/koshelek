@@ -1,0 +1,45 @@
+# При каждом обновлении на GitHub выкладывает сайт в Yandex Object Storage
+# Адрес: https://koshelek.website.yandexcloud.net
+name: Публикация в Yandex Cloud
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-yandex
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Проверка ключей
+        env:
+          KEY_ID: ${{ secrets.YC_ACCESS_KEY_ID }}
+        run: |
+          if [ -z "$KEY_ID" ]; then
+            echo "::error::Нет секретов YC_ACCESS_KEY_ID / YC_SECRET_ACCESS_KEY в настройках репозитория"
+            exit 1
+          fi
+
+      - name: Загрузка в хранилище
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.YC_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.YC_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ru-central1
+          S3: aws s3 --endpoint-url=https://storage.yandexcloud.net
+          BUCKET: s3://koshelek
+        run: |
+          set -e
+          # картинки — с долгим кэшем
+          $S3 sync . $BUCKET --exclude "*" --include "*.png" --cache-control "public,max-age=604800"
+          # манифест — с правильным типом
+          $S3 cp manifest.webmanifest $BUCKET/manifest.webmanifest --content-type "application/manifest+json" --cache-control "no-cache"
+          # страница и офлайн-скрипт — без кэша, чтобы обновления приходили сразу
+          $S3 cp sw.js $BUCKET/sw.js --content-type "text/javascript; charset=utf-8" --cache-control "no-cache"
+          $S3 cp index.html $BUCKET/index.html --content-type "text/html; charset=utf-8" --cache-control "no-cache"
+          echo "Готово: https://koshelek.website.yandexcloud.net"
