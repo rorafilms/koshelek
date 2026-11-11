@@ -342,6 +342,23 @@ body .aib{display:grid} body .aicard{display:block}
 .keyok{font-size:13px;color:var(--green);margin:6px 2px 0;font-weight:600}
 .connect{margin-top:10px}
 
+.imp{display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-top:1px solid var(--line);transition:opacity .2s}
+.imp:first-child{border-top:0}
+.imp.off{opacity:.45}
+.imp .t{flex:1;min-width:0}.imp .n{font-weight:600}.imp .d{font-size:12px;color:var(--muted)}
+.imp .amt{font-weight:700;white-space:nowrap}
+.tick{width:26px;height:26px;border-radius:8px;border:2px solid var(--accent);color:#fff;font-weight:800;font-size:14px;flex:none;margin-top:7px;display:grid;place-items:center}
+.imp:not(.off) .tick{background:var(--accent)}
+.impcat{margin-top:6px;font-size:13px;padding:5px 8px;border-radius:9px;border:1px solid var(--line);background:var(--fill);color:var(--ink);max-width:100%}
+.flow{display:grid;gap:10px}
+.flow .fr{display:grid;grid-template-columns:78px 1fr auto;align-items:center;gap:10px;font-size:14px}
+.flow .fb{height:12px;border-radius:7px;background:var(--fill);overflow:hidden}
+.flow .fb i{display:block;height:100%;width:0;border-radius:7px;transition:width .9s var(--ease)}
+.net{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:12px;border-top:1px solid var(--line);font-size:14px}
+.cardrow{display:flex;align-items:center;gap:12px;padding:9px 0;border-top:1px solid var(--line)}
+.cardrow:first-child{border-top:0}
+.cardrow .cc{width:40px;height:28px;border-radius:7px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:9.5px;font-weight:700;display:grid;place-items:center;flex:none}
+.cardrow .t{flex:1;min-width:0}.cardrow .d{font-size:12px;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -385,6 +402,17 @@ body .aib{display:grid} body .aicard{display:block}
       <div class="stat press"><div class="k"><i style="background:var(--amber-s)">📌</i>Платежи</div><div class="v a" id="sFix">0 ₽</div></div>
       <div class="stat press"><div class="k"><i style="background:var(--red-s)">↑</i>Потрачено</div><div class="v r" id="sSpent">0 ₽</div></div>
       <div class="stat press"><div class="k"><i style="background:var(--accent-s)">◎</i>Останется</div><div class="v" id="sLeft">0 ₽</div></div>
+    </div>
+
+    <div class="card" id="flowCard">
+      <h3>Пришло и ушло <small id="flowSub"></small></h3>
+      <div class="flow" id="flow"></div>
+      <div class="net" id="flowNet"></div>
+    </div>
+
+    <div class="card hidden" id="cardsCard">
+      <h3>Мои карты <small id="cardsTotal"></small></h3>
+      <div id="cardsList"></div>
     </div>
 
     <div class="tip" id="tip"></div>
@@ -590,6 +618,16 @@ body .aib{display:grid} body .aicard{display:block}
   </div>
 </div>
 
+<div class="sheet" id="shImp">
+  <div class="grabz"><div class="grab"></div></div>
+  <h4>Из SMS банка <span style="display:flex;gap:8px"><button class="chip" id="impPaste" style="font-size:13px;padding:7px 11px">📋 Ещё</button><button class="x" data-close>✕</button></span></h4>
+  <div class="hscroll" id="impDays"></div>
+  <input class="inp hidden" type="date" id="impDate" style="margin-bottom:12px">
+  <div id="impList"></div>
+  <div class="m" id="impHint" style="font-size:12.5px;margin:10px 4px"></div>
+  <button class="btn" id="impSave">Добавить</button>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -597,7 +635,7 @@ body .aib{display:grid} body .aicard{display:block}
 "use strict";
 const CATS=[["food","🛒","Продукты","#16A36A"],["cafe","🍔","Кафе","#E8930C"],["transport","🚌","Транспорт","#3B82F6"],["home","🏠","Дом","#8B5CF6"],
   ["health","💊","Здоровье","#EC4899"],["clothes","👕","Одежда","#14B8A6"],["fun","🎮","Развлечения","#F43F5E"],["gifts","🎁","Подарки","#F59E0B"],
-  ["other","📦","Другое","#64748B"],["save","🐷","В копилку","#5B5CF0"]];
+  ["transfer","🔁","Переводы","#0EA5E9"],["other","📦","Другое","#64748B"],["save","🐷","В копилку","#5B5CF0"]];
 const CAT=Object.fromEntries(CATS.map(c=>[c[0],c]));
 const PICK=CATS.filter(c=>c[0]!=="save");
 const EMO=["🎯","📱","✈️","🚗","🏠","💻","🎓","🛋️","💍","🏖️","🎁","🛟"];
@@ -624,8 +662,8 @@ const human=s=>{const d=parse(s);return d.getDate()+" "+MG[d.getMonth()]};
 const sum=(a,f)=>a.reduce((s,x)=>s+(+f(x)||0),0);
 
 // ---------- state ----------
-let state={plans:[],months:{},goals:[]};
-try{const s=JSON.parse(localStorage.getItem(LS)||"null");if(s&&Array.isArray(s.plans))state={plans:s.plans,months:s.months||{},goals:s.goals||[]}}catch(e){}
+let state={plans:[],months:{},goals:[],incomes:{},cards:{}};
+try{const s=JSON.parse(localStorage.getItem(LS)||"null");if(s&&Array.isArray(s.plans))state={plans:s.plans,months:s.months||{},goals:s.goals||[],incomes:s.incomes||{},cards:s.cards||{}}}catch(e){}
 function saveLocal(){try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}}
 
 let today=new Date();
@@ -666,7 +704,7 @@ function render(){
   const y=cur.getFullYear(),m=cur.getMonth();
   $("mTitle").textContent=MONTHS[m]+(y!==today.getFullYear()?" "+y:"");
   const st=stats(y,m);
-  rHome(st,y,m);rSpend(st);rCal(st,y,m);rGoals();rPlan();
+  rHome(st,y,m);rFlow(st);rSpend(st);rCal(st,y,m);rGoals();rPlan();
   firstPaint=false;
 }
 
@@ -733,6 +771,25 @@ function rHome(st,y,m){
     :'<div class="empty">'+(isPast?"Месяц закончился":"В этом месяце больше поступлений нет")+'</div>';
 }
 
+function rFlow(st){
+  const inc=(state.incomes&&state.incomes[st.key])||[];
+  const inSum=sum(inc,i=>i.amount),outSum=sum(st.items.filter(i=>i.cat!=="save"),i=>i.amount),saved=sum(st.items.filter(i=>i.cat==="save"),i=>i.amount);
+  const planIn=st.inc;const mx=Math.max(inSum,outSum,planIn,1);
+  const row=(lbl,v,col,sub)=>'<div class="fr"><span>'+lbl+'</span><div class="fb"><i style="background:'+col+'" data-w="'+(v/mx*100)+'%"></i></div><b class="amt">'+money(v)+'</b></div>'+(sub?'<div class="m" style="font-size:12px;margin:-6px 0 0 88px">'+sub+'</div>':'');
+  $("flow").innerHTML=row("Пришло",inSum,"linear-gradient(90deg,#16A36A,#5FE3C0)",planIn?"план — "+money(planIn):"")+row("Ушло",outSum,"linear-gradient(90deg,#E5484D,#F08A5D)","")+(saved?row("Отложено",saved,"linear-gradient(90deg,var(--accent),var(--accent2))",""):"");
+  const net=inSum-outSum-saved;
+  $("flowNet").innerHTML=inc.length?'<span class="m">Итог месяца по факту</span><b class="'+(net>=0?"g":"r")+'">'+(net>=0?"+":"−")+money(Math.abs(net))+'</b>':'<span class="m" style="font-size:13px">Поступления добавляются из SMS банка: «+» → «📋 Из SMS»</span>';
+  $("flowSub").textContent=MONTHS[+st.key.slice(5)-1].toLowerCase();
+  grow($("flow"));
+  const cards=Object.entries(state.cards||{}).sort((a,b)=>b[1].at.localeCompare(a[1].at));
+  $("cardsCard").classList.toggle("hidden",!cards.length);
+  if(cards.length){
+    $("cardsTotal").textContent="всего "+money(sum(cards,c=>c[1].balance));
+    $("cardsList").innerHTML=cards.map(([id,c])=>{const d=c.at.slice(0,10),tm=c.at.slice(11,16);
+      const when=d===ymd(new Date())?"сегодня "+tm:human(d)+" "+tm;
+      return '<div class="cardrow"><div class="cc">'+esc(id.replace(/^(MIR|VISA|ECMC|MC|MAES)-?/,"").replace(/^СЧЁТ/,"сч ").replace(/^КАРТА\*?/,"*"))+'</div><div class="t"><div>'+esc(c.name||id)+'</div><div class="d">обновлено '+when+'</div></div><b class="amt">'+money(c.balance)+'</b></div>'}).join("")}
+}
+
 function itemRow(i,mk){const c=CAT[i.cat]||CAT.other;
   return '<div class="sw" data-sid="'+i.id+'" data-m="'+mk+'"><div class="sw-bg" data-delsp>Удалить</div><div class="row'+nw(i.id)+'"'+sd()+'><div class="ic" style="background:'+c[3]+'22">'+c[1]+'</div><div class="t"><div class="n">'+esc(i.note||c[2])+'</div>'+
     (i.note?'<div class="d">'+c[2]+'</div>':'')+'</div><div class="amt r">−'+money(i.amount)+'</div></div></div>'}
@@ -757,6 +814,7 @@ function rCal(st,y,m){
   const I={},F={},S={};
   st.pl.forEach(x=>{const o=x.p.type==="income"?I:F;o[x.date]=(o[x.date]||0)+(+x.p.amount||0)});
   st.items.forEach(i=>S[i.date]=(S[i.date]||0)+(+i.amount||0));
+  ((state.incomes||{})[st.key]||[]).forEach(i=>I[i.date]=(I[i.date]||0)+(+i.amount||0));
   let h=["Пн","Вт","Ср","Чт","Пт","Сб","Вс"].map(d=>'<div class="wd">'+d+'</div>').join("");
   for(let i=0;i<first;i++)h+='<div class="day out"></div>';
   for(let d=1;d<=n;d++){const k=st.key+"-"+pad(d),c=["day"];if(k===tk)c.push("today");if(k===selDay)c.push("sel");if(I[k])c.push("inc");
@@ -766,6 +824,7 @@ function rCal(st,y,m){
   $("dayTitle").innerHTML=(selDay===tk?"Сегодня, ":"")+human(selDay)+(S[selDay]?' <small>−'+money(S[selDay])+'</small>':'');
   const rows=[];
   st.pl.filter(x=>x.date===selDay).forEach(x=>rows.push('<div class="row"><div class="ic" style="background:'+(x.p.type==="income"?"var(--green-s)":"var(--amber-s)")+'">'+(x.p.type==="income"?"💰":"📌")+'</div><div class="t"><div class="n">'+esc(x.p.name)+'</div><div class="d">'+(x.p.type==="income"?"доход":"обязательный платёж")+'</div></div><div class="amt '+(x.p.type==="income"?"g":"a")+'">'+(x.p.type==="income"?"+":"−")+money(x.p.amount)+'</div></div>'));
+  ((state.incomes||{})[st.key]||[]).filter(i=>i.date===selDay).forEach(i=>rows.push('<div class="sw" data-iid="'+i.id+'" data-m="'+st.key+'"><div class="sw-bg" data-delin>Удалить</div><div class="row"><div class="ic" style="background:var(--green-s)">💰</div><div class="t"><div class="n">'+esc(i.who||"Поступление")+'</div><div class="d">поступление'+(i.card?" · "+esc(i.card):"")+(i.time?" · "+i.time:"")+'</div></div><div class="amt g">+'+money(i.amount)+'</div></div></div>'));
   st.items.filter(i=>i.date===selDay).forEach(i=>rows.push(itemRow(i,st.key)));
   $("dayList").innerHTML=rows.length?rows.join(""):'<div class="empty">В этот день ничего нет</div>';
 }
@@ -850,6 +909,9 @@ document.addEventListener("click",e=>{
       toast("Трата удалена",()=>{(state.months[k]=state.months[k]||[]).push(it);seen.delete(it.id);
         if(it.cat==="save"&&it.goal){const g=state.goals.find(x=>x.id===it.goal);if(g){g.saved=(g.saved||0)+it.amount;saveGoals()}}
         saveMonth(k);render()})});return}
+  const di=e.target.closest("[data-delin]");
+  if(di){const w=di.closest(".sw"),k=w.dataset.m,id=w.dataset.iid,L=(state.incomes[k]||[]),it=L.find(x=>x.id===id);if(!it)return;
+    collapse(w,()=>{state.incomes[k]=L.filter(x=>x.id!==id);saveLocal();render();toast("Поступление удалено",()=>{state.incomes[k].push(it);saveLocal();render()})});return}
   const dp=e.target.closest("[data-delpl]");
   if(dp){const w=dp.closest(".sw"),id=w.dataset.pid,it=state.plans.find(p=>p.id===id);
     collapse(w,()=>{state.plans=state.plans.filter(p=>p.id!==id);savePlans();render();
@@ -902,7 +964,7 @@ function paintDays(){const t=new Date(),y=new Date();y.setDate(t.getDate()-1);
 $("spDays").onclick=e=>{const b=e.target.closest("[data-d]");if(!b)return;spDay=b.dataset.d;
   if(spDay==="pick"&&!$("spDate").value)$("spDate").value=ymd(today);paintDays();if(spDay==="pick")try{$("spDate").showPicker()}catch(_){}};
 $("spDate").onchange=paintDays;
-$("fab").onclick=()=>{kp="";$("spNote").value="";pendingSms=null;$("smsBox").classList.add("hidden");
+$("fab").onclick=()=>{kp="";$("spNote").value="";$("smsBox").classList.add("hidden");
   const isCur=ym(cur)===ym(today);
   if(vi===2&&selDay!==ymd(today)){spDay="pick";$("spDate").value=selDay}else if(isCur){spDay="today"}else{spDay="pick";$("spDate").value=ym(cur)+"-01"}
   paintCats();paintDays();paintKp();openSheet("shSpend")};
@@ -911,7 +973,6 @@ $("spSave").onclick=()=>{const a=num(kp);
   let date=ymd(today);if(spDay==="yday"){const d=new Date();d.setDate(d.getDate()-1);date=ymd(d)}else if(spDay==="pick")date=$("spDate").value||date;
   const k=date.slice(0,7);
   (state.months[k]=state.months[k]||[]).push({id:uid(),date,amount:Math.round(a*100)/100,cat:spCat,note:$("spNote").value.trim().slice(0,80),t:Date.now()});
-  if(pendingSms){smsMarkSeen(pendingSms);pendingSms=null}
   saveMonth(k);closeSheet();const [yy,mm]=k.split("-").map(Number);cur=new Date(yy,mm-1,1);render();toast("Записано: "+money(a)+" "+CAT[spCat][1])};
 document.addEventListener("keydown",e=>{if(!sheet||sheet.id!=="shSpend"||e.target.tagName==="INPUT")return;
   if(/^[0-9]$/.test(e.key)){$('[data-k="'+e.key+'"]').click()}else if(e.key==="Backspace")$('[data-k="⌫"]').click();
@@ -1136,6 +1197,8 @@ function aiContext(){
     L.push("Траты по категориям за "+MONTHS[d.getMonth()].toLowerCase()+" "+d.getFullYear()+(k===0?" (текущий, неполный)":"")+": "+Object.entries(by).sort((a,b)=>b[1]-a[1]).map(([c,v])=>(CAT[c]||CAT.other)[2]+" "+money(v)).join(", ")+"; всего "+money(sum(it,i=>i.amount))+".")}
   const last=itemsBetween(ymd(new Date(y,m,t.getDate()-13)),tk).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,25);
   if(last.length)L.push("Последние траты (14 дней):"+last.map(i=>"\n- "+i.date+" "+(CAT[i.cat]||CAT.other)[2]+(i.note?" ("+i.note+")":"")+": "+money(i.amount)).join(""));
+  const fi=((state.incomes||{})[ym(t)]||[]);if(fi.length)L.push("Фактические поступления за месяц: "+money(sum(fi,i=>i.amount))+" ("+fi.slice(-8).map(i=>(i.who||"поступление")+" "+money(i.amount)).join(", ")+").");
+  const cs=Object.entries(state.cards||{});if(cs.length)L.push("Остатки на картах: "+cs.map(([k,c])=>k+" — "+money(c.balance)).join(", ")+".");
   L.push("Цели-копилки:"+(state.goals.map(g=>"\n- "+g.name+": накоплено "+money(g.saved||0)+" из "+money(g.target)).join("")||" нет"));
   return L.join("\n");
 }
@@ -1216,92 +1279,145 @@ $("bkSave").onclick=async()=>{const data=JSON.stringify({app:"koshelek",v:1,save
 $("bkLoad").onclick=()=>$("bkFile").click();
 $("bkFile").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;
   try{const d=JSON.parse(await f.text());if(!d||!Array.isArray(d.plans))throw 0;
-    const prev=state;state={plans:d.plans,months:d.months||{},goals:d.goals||[]};seen.clear();saveLocal();closeSheet();render();
+    const prev=state;state={plans:d.plans,months:d.months||{},goals:d.goals||[],incomes:d.incomes||{},cards:d.cards||{}};seen.clear();saveLocal();closeSheet();render();
     toast("Данные восстановлены",()=>{state=prev;saveLocal();render()})}
   catch(_){toast("Это не файл копии Кошелька")}};
 let wipeArm=0;
 $("wipe").onclick=()=>{if(Date.now()-wipeArm>3000){wipeArm=Date.now();$("wipe").textContent="Точно удалить? Нажмите ещё раз";
     setTimeout(()=>{$("wipe").textContent="Удалить все данные"},3000);return}
-  const prev=state;state={plans:[],months:{},goals:[]};seen.clear();saveLocal();$("wipe").textContent="Удалить все данные";closeSheet();render();
+  const prev=state;state={plans:[],months:{},goals:[],incomes:{},cards:{}};seen.clear();saveLocal();$("wipe").textContent="Удалить все данные";closeSheet();render();
   toast("Все данные удалены",()=>{state=prev;saveLocal();render()})};
 if("serviceWorker" in navigator&&/^https?:$/.test(location.protocol))addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 
-// ---------- траты из SMS банка ----------
+// ---------- операции из SMS банка: траты, поступления, переводы, остатки ----------
 const MERCH_CATS=[
-  ["food",/пят[её]роч|pyaterochk|магнит|magnit|перекр[её]ст|perekrest|лента|lenta|ашан|auchan|дикси|dixy|вкусвилл|vkusvill|spar|спар|metro|метро кэш|окей|okey|окей|красное.?белое|krasnoe|бристоль|bristol|монетк|monetk|светофор|fix ?price|фикс прайс|самокат|samokat|лавка|lavka|продукт|grocery|market|маркет/i],
-  ["cafe",/кафе|cafe|caf[eé]|кофе|coffee|кофейн|ресторан|restoran|restaurant|бургер|burger|kfc|rostic|ростикс|вкусно и точка|vkusno|додо|dodo|pizza|пицц|суши|sushi|роллы|шоколадниц|столов|stolovaya|еда|eda|delivery|доставк|teremok|теремок|subway|starbucks|cofix|кофикс/i],
-  ["transport",/такси|taxi|yandex\.?go|яндекс ?go|uber|ситимобил|metro|метрополит|транспорт|transport|тройка|troika|автобус|bus|ржд|rzd|аэрофлот|aeroflot|азс|azs|лукойл|lukoil|газпромнефть|gazpromneft|роснефть|rosneft|татнефть|shell|parking|парковк|каршер|делимобиль|delimobil|whoosh|юрент|самолет|авиа|aviasales/i],
-  ["health",/аптек|apteka|pharm|фарм|здоров|zdorov|клиник|clinic|стоматолог|dental|медиц|medic|invitro|инвитро|гемотест|лаборатор/i],
-  ["clothes",/lamoda|ламода|zara|h&m|hm |gloria|глория|befree|ostin|остин|sportmaster|спортмастер|обув|одежд|одеж|befree|uniqlo|love republic|zolla/i],
-  ["fun",/кино|cinema|kino|steam|playstation|xbox|nintendo|игр|game|театр|theatre|концерт|concert|кассир|kassir|ticketland|яндекс ?плюс|yandex ?plus|кинопоиск|kinopoisk|okko|ivi|spotify|музе|бар |bar |пиво|beer/i],
-  ["home",/мтс|mts|билайн|beeline|мегафон|megafon|tele2|теле2|yota|ростелеком|rostelecom|жкх|zhkh|коммунал|электроэнерг|водоканал|газ |леруа|leroy|икеа|ikea|hoff|хофф|obi|оби|домашн|хозтовар|интернет/i],
+  ["food",/пят[её]роч|pyaterochk|магнит|magnit|перекр[её]ст|perekrest|лента|lenta|ашан|auchan|дикси|dixy|вкусвилл|vkusvill|spar|спар|metro c|окей|okey|красное.?белое|krasnoe|бристоль|bristol|монетк|monetk|светофор|fix ?price|фикс ?прайс|самокат|samokat|лавка|lavka|продукт|grocery|маркет|market|чижик|верный|мария-ра|ярче|холди|командор/i],
+  ["cafe",/кафе|cafe|caf[eé]|кофе|coffee|кофейн|ресторан|restoran|restaurant|бургер|burger|kfc|rostic|ростикс|вкусно и точка|vkusno|додо|dodo|pizza|пицц|суши|sushi|роллы|шоколадниц|столов|stolovaya|яндекс ?еда|yandex ?eda|delivery|доставк|teremok|теремок|subway|starbucks|cofix|кофикс|шаурм|шаверм|пекарн|bakery/i],
+  ["transport",/такси|taxi|yandex\.?go|яндекс ?go|uber|ситимобил|metro|метрополит|транспорт|transport|тройка|troika|автобус|ржд|rzd|аэрофлот|aeroflot|азс|azs|лукойл|lukoil|газпромнефть|gazpromneft|роснефть|rosneft|татнефть|parking|парковк|каршер|делимобиль|delimobil|whoosh|юрент|авиа|aviasales|пригород/i],
+  ["health",/аптек|apteka|pharm|фарм|здоров|zdorov|клиник|clinic|стоматолог|dental|медиц|medic|invitro|инвитро|гемотест|лаборатор|ригла|rigla/i],
+  ["clothes",/lamoda|ламода|zara|gloria|глория|befree|ostin|остин|sportmaster|спортмастер|обув|одежд|uniqlo|love republic|zolla|wildberries|вайлдберриз|ozon|озон/i],
+  ["fun",/кино|cinema|kino|steam|playstation|xbox|nintendo|игр|game|театр|theatre|концерт|concert|кассир|kassir|ticketland|яндекс ?плюс|yandex ?plus|кинопоиск|kinopoisk|okko|ivi|spotify|музе|\bбар\b|\bbar\b|пиво|beer/i],
+  ["home",/мтс|\bmts\b|билайн|beeline|мегафон|megafon|tele2|теле2|yota|ростелеком|rostelecom|жкх|zhkh|коммунал|электроэнерг|водоканал|леруа|leroy|икеа|ikea|hoff|хофф|хозтовар|интернет|domru|дом\.ру/i],
   ["gifts",/цвет|flower|подар|gift|детский мир|toy/i],
 ];
 function guessCat(t){for(const [c,re] of MERCH_CATS)if(re.test(t))return c;return "other"}
-const INCOME_RE=/зачислен|поступлен|пополнен|перевод от|получен перевод|зарплат|возврат|refund|cashback|кешб[эе]к|кэшб[эе]к/i;
-const SPEND_RE=/покупк|оплат|списан|pokupka|oplata|spisan|purchase|payment|снят|выдача|перевод\b|перевод на|перевод\s+\d|сбп/i;
-function parseBankSms(raw){
-  const t=String(raw||"").replace(/ /g," ").replace(/\s+/g," ").trim();
-  if(!t)return {err:"Пустой текст"};
-  const amtRe=/(\d{1,3}(?:[   ]\d{3})+|\d+)(?:[.,](\d{1,2}))?\s?(?:руб\.?|р\.?|rub|rur|₽)(?![а-яёa-z])/gi;
-  const all=[...t.matchAll(amtRe)];
-  if(!all.length)return {err:"Не нашёл сумму в тексте"};
-  // первая сумма, которая не после слов «баланс/доступно/остаток»
-  let m=all.find(x=>!/(баланс|доступно|остаток|balance|ostatok|dostupno)[:\s]*$/i.test(t.slice(Math.max(0,x.index-14),x.index)))||all[0];
-  const amount=parseFloat(m[1].replace(/[  ]/g,"")+(m[2]?"."+m[2]:""));
-  if(!(amount>0))return {err:"Не нашёл сумму"};
-  const isIncome=INCOME_RE.test(t)&&!/покупк|оплат|списан/i.test(t);
-  if(isIncome)return {income:true,amount};
-  if(!SPEND_RE.test(t)&&!/\*\d{4}|карт|card|mir|visa|mastercard/i.test(t))return {err:"Похоже, это не трата"};
-  // магазин: текст после суммы до «Баланс/Доступно/Остаток»
-  let after=t.slice(m.index+m[0].length).replace(/^[\s.,:;-]+/,"");
-  after=after.replace(/(?:карта|карты|card|счёт|счет)\s*\*?\d{4}|\*\d{4}|(?:mir|visa|mc|ecmc)-?\d{4}/gi," ").replace(/^[\s.,:;-]+/,"");
-  after=after.split(/(?:баланс|доступно|остаток|balance|ostatok|dostupno)/i)[0];
-  let merchant=after.replace(/["«»]/g,"").replace(/[.,;:\s-]+$/,"").trim();
-  if(!merchant||merchant.length<2){ // магазин мог быть до суммы (например, «Покупка в ПЯТЕРОЧКА 450р»)
-    const before=t.slice(0,m.index).replace(/^.*?(покупк\S*|оплат\S*|списан\S*)\s*(в|в магазине)?\s*/i,"").replace(/\d{2}:\d{2}|\d{2}\.\d{2}(\.\d{2,4})?|mir-?\d{4}|\*\d{4}|карт\S*/gi,"").trim();
-    merchant=before;
-  }
-  merchant=merchant.replace(/(\s+\d+)+$/,"").slice(0,40);
-  const cat=guessCat(merchant+" "+t);
-  const pretty=merchant?merchant.toLowerCase().replace(/(^|\s)\S/g,s=>s.toUpperCase()):"";
-  // дата из SMS (дд.мм) — если есть и не в будущем
-  let date=ymd(new Date());const dm=t.match(/\b(\d{2})\.(\d{2})(?:\.(\d{2,4}))?\b/);
-  if(dm){const now=new Date();let y=dm[3]?(+dm[3]<100?2000+ +dm[3]:+dm[3]):now.getFullYear();const d=new Date(y,+dm[2]-1,+dm[1]);
-    if(d<=now&&now-d<62*864e5&&d.getDate()===+dm[1])date=ymd(d)}
-  return {amount:Math.round(amount*100)/100,merchant:pretty,cat,date}}
-window.__parseSms=parseBankSms;
+const BANKS=/сбер|т-банк|тинькофф|tinkoff|t-bank|альфа|alfa|втб|vtb|газпромбанк|райффайзен|raiffeisen|открыти|совкомбанк|озон банк|ozon bank|яндекс банк|мтс банк|почта банк|росбанк|уралсиб|мкб|хоум|россельхоз|псб/i;
+const num2=s=>parseFloat(String(s).replace(/[\s  ]/g,"").replace(",","."));
+const titleCase=s=>s.toLowerCase().replace(/(^|[\s.«"(-])([a-zа-яё])/g,(m,a,b)=>a+b.toUpperCase());
+
+function splitSms(raw){
+  return String(raw||"").replace(/ /g," ").split(/\n\s*\n|\r?\n(?=\S)/)
+    .flatMap(ch=>ch.split(/(?=Сч[её]т карты\s)|(?=СЧ[ЁЕ]Т\s?\d{4}\s)|(?<!карты\s)(?=(?:MIR|VISA|ECMC|MC|MAES)-?\d{4}\s+\d{1,2}[:.]\d{2})/i))
+    .map(s=>s.replace(/\s+/g," ").trim()).filter(s=>s.length>8)}
+
+function parseOne(raw){
+  const t=String(raw).replace(/ /g," ").replace(/\s+/g," ").trim();
+  const AMT=/([+−-]?)\s?(\d{1,3}(?:[  ]\d{3})+|\d+)(?:[.,](\d{1,2}))?\s?(?:руб\.?|р\.?|rub|rur|₽)(?![а-яёa-z])/gi;
+  const all=[...t.matchAll(AMT)];if(!all.length)return null;
+  const isBal=x=>/(баланс|доступно|остаток|balance|dostupno)[:\s]*$/i.test(t.slice(Math.max(0,x.index-16),x.index));
+  const m=all.find(x=>!isBal(x));if(!m)return null;
+  const amount=num2(m[2]+(m[3]?"."+m[3]:""));if(!(amount>0))return null;
+  const balM=all.find(isBal);const balance=balM?num2(balM[2]+(balM[3]?"."+balM[3]:"")):null;
+  const cardM=t.match(/(?:MIR|VISA|ECMC|MC|MAES)-?\d{4}|СЧ[ЁЕ]Т\s?\d{4}|(?:карт[аы]?|card)\s*\*\d{4}|\*\d{4}/i);
+  const card=cardM?cardM[0].toUpperCase().replace(/\s/g,"").replace("СЧЕТ","СЧЁТ").replace(/^(?:КАРТ[АЫ]?|CARD)/,"КАРТА"):"";
+  const tm=t.match(/\b(\d{1,2}):(\d{2})\b/);const time=tm?pad(tm[1])+":"+tm[2]:"";
+  let date=null;const dm=t.match(/\b(\d{2})\.(\d{2})(?:\.(\d{2,4}))?\b/);
+  if(dm){const now=new Date();const y=dm[3]?(+dm[3]<100?2000+ +dm[3]:+dm[3]):now.getFullYear();const d=new Date(y,+dm[2]-1,+dm[1]);if(d<=now&&now-d<62*864e5&&d.getDate()===+dm[1])date=ymd(d)}
+  const before=t.slice(0,m.index),after=t.slice(m.index+m[0].length);
+  const op=(before.match(/(покупк\S*(?: по сбп)?|оплат\S*|списан\S*|перевод\S*(?: по сбп)?|зачислен\S*|поступлен\S*|пополнен\S*|возврат\S*|выдача\S*|снят\S*|отмен\S*)[^]*$/i)||[""])[0].toLowerCase();
+  const plus=m[1]==="+"||/\+\s?\d/.test(m[0]);
+  let type="spend";
+  if(plus||/зачислен|поступлен|пополнен|возврат|отмен|cashback|кешб|кэшб/.test(op)||/перевод\S* (?:по сбп )?(?:из|от)(?![а-яё])/.test(op)||/(?:^|\s)от\s+[А-ЯЁA-Z]/.test(after))type="income";
+  else if(/перевод/.test(op))type="transfer";
+  else if(!/покупк|оплат|списан|выдача|снят/.test(op)&&!/покупк|оплат|списан/i.test(t))return null;
+  // контрагент
+  let who=after.split(/(?:баланс|доступно|остаток|balance|dostupno)/i)[0]
+    .replace(/(?:MIR|VISA|ECMC|MC)-?\d{4}|\*\d{4}|карт[аы]?\s*\*?\d{4}/gi," ").replace(/["«»]/g,"").replace(/\s+/g," ").trim().replace(/[.,;:\s-]+$/,"");
+  if(type==="income"){const f=t.match(/(?:^|\s)от\s+([^]+?)(?:\.?\s*(?:баланс|доступно|остаток)|$)/i);if(f)who=f[1];
+    const bank=(before+" "+after).match(/из\s+([А-ЯЁA-Z][\wА-ЯЁа-яё-]*(?:\s?банк|-банк)?)/);
+    if(/\bATM\b|банкомат/i.test(t))who="Внесение наличных";else if(!who&&bank)who="Перевод из "+bank[1]}
+  if(type==="spend"&&(!who||who.length<2)){who=before.replace(/^.*?(покупк\S*|оплат\S*|списан\S*)(?: по сбп)?\s*(?:в|в магазине)?\s*/i,"").replace(/\d{1,2}:\d{2}|\d{2}\.\d{2}(\.\d{2,4})?|(?:MIR|VISA|ECMC|MC)-?\d{4}|\*\d{4}|сч[её]т\S*|карт\S*/gi,"").trim()}
+  who=who.replace(/^(?:[A-Z]\d{2,5}|\d{3,})\s+/,"").replace(/\s+\d{3,}$/,"").replace(/^ATM\s*\d*\s*/i,"").trim().slice(0,40);
+  const pretty=(/[a-zа-яё]/.test(who)?who:titleCase(who)).replace(/^(Ип|Ооо|Зао|Пао|Оао)(?=\s)/,x=>x.toUpperCase()).replace(/\.$/,"");
+  const cat=type==="spend"?guessCat(who+" "+t):type==="transfer"?"transfer":"income";
+  return {raw:t,type,amount:Math.round(amount*100)/100,who:pretty,cat,card,time,date,smsDate:date,balance,cash:/внесение наличных/i.test(pretty)}}
+window.__parseSms=parseOne;
+
+function opKey(o){return [o.card,o.smsDate||"",o.time,o.type,o.amount].join("|")}
 const SMS_SEEN="koshelek.smsseen";
-function smsKey(t){let h=0;for(const c of String(t))h=(h*31+c.charCodeAt(0))|0;return String(h)}
-function smsWasSeen(t){try{return (JSON.parse(localStorage.getItem(SMS_SEEN)||"[]")).includes(smsKey(t))}catch(e){return false}}
-function smsMarkSeen(t){try{const a=JSON.parse(localStorage.getItem(SMS_SEEN)||"[]");a.push(smsKey(t));localStorage.setItem(SMS_SEEN,JSON.stringify(a.slice(-300)))}catch(e){}}
-let pendingSms=null;
-function fillFromSms(text){
-  const r=parseBankSms(text);
-  if(r.err){toast(r.err);return false}
-  if(r.income){toast("Это поступление "+money(r.amount)+" — траты не добавляю");return false}
-  const dup=smsWasSeen(text);
-  kp=String(r.amount).replace(".",",");spCat=r.cat;$("spNote").value=r.merchant;
-  if(r.date!==ymd(new Date())){spDay="pick";$("spDate").value=r.date}else spDay="today";
-  pendingSms=text;
-  if(!sheet||sheet.id!=="shSpend")openSheet("shSpend");
-  paintCats();paintDays();paintKp(true);
-  const b=$$("#spCats .chip.on")[0];if(b)b.scrollIntoView({inline:"center",block:"nearest"});
-  $("kpH").textContent=dup?"⚠️ Похоже, эту SMS вы уже добавляли":"Из SMS: проверьте и нажмите «Сохранить»";
+function seenSet(){try{return new Set(JSON.parse(localStorage.getItem(SMS_SEEN)||"[]"))}catch(e){return new Set()}}
+function markSeen(keys){try{const a=[...seenSet(),...keys];localStorage.setItem(SMS_SEEN,JSON.stringify(a.slice(-600)))}catch(e){}}
+
+// ---- импорт: экран проверки ----
+let impOps=[],impDay="today";
+function impDate(){if(impDay==="yday"){const d=new Date();d.setDate(d.getDate()-1);return ymd(d)}if(impDay==="pick")return $("impDate").value||ymd(new Date());return ymd(new Date())}
+function openImport(text){
+  const parts=splitSms(text);const ops=parts.map(parseOne).filter(Boolean);
+  if(!ops.length){toast(parts.length?"Не нашёл операций в тексте":"Пустой текст");return false}
+  const seen=seenSet();
+  ops.forEach(o=>{o.on=true;o.note="";o.dupe=false});
+  // переводы между своими счетами: исходящий перевод и зачисление той же суммы в течение 30 минут
+  const mins=o=>o.time?(+o.time.slice(0,2))*60+ +o.time.slice(3):null;
+  ops.forEach(a=>{if(a.type!=="transfer")return;const b=ops.find(b=>b!==a&&b.type==="income"&&!b.pair&&b.amount===a.amount&&(mins(a)==null||mins(b)==null||Math.abs(mins(a)-mins(b))<=30));
+    if(b){a.pair=b.pair=true;a.on=b.on=false;a.note=b.note="перевод между своими счетами"}});
+  ops.forEach(o=>{if(o.type==="transfer"&&!o.pair&&BANKS.test(o.who)){o.on=false;o.note="похоже на перевод себе в другой банк"}
+    if(o.cash){o.on=false;o.note="внесение наличных — обычно это ваши же деньги"}});
+  impOps=ops;impDay=ops.some(o=>o.date)?"sms":"today";
+  ops.forEach(o=>{if(seen.has(opKey(o))){o.dupe=true;o.on=false;o.note="уже добавлено раньше"}});
+  if(sheet&&sheet.id!=="shImp"){closeSheet();setTimeout(()=>{renderImp();openSheet("shImp")},280)}else{renderImp();openSheet("shImp")}
   return true}
+const TYPE_LBL={spend:"Трата",income:"Поступление",transfer:"Перевод"};
+function renderImp(){
+  const d=impDate();
+  $("impDays").innerHTML=impDay==="sms"?'<span class="m" style="font-size:13px">Даты взяты из SMS</span>':
+    [["today","Сегодня"],["yday","Вчера"],["pick",impDay==="pick"&&$("impDate").value?"📅 "+human($("impDate").value):"📅 Другая дата"]].map(o=>'<button class="chip'+(o[0]===impDay?" on":"")+'" data-impd="'+o[0]+'">'+o[1]+'</button>').join("");
+  $("impDate").classList.toggle("hidden",impDay!=="pick");
+  $("impList").innerHTML=impOps.map((o,i)=>{const c=o.type==="income"?["","💰","Поступление","#16A36A"]:(CAT[o.cat]||CAT.other);
+    const sign=o.type==="income"?"+":"−",cls=o.type==="income"?"g":o.type==="transfer"?"":"r";
+    return '<div class="imp'+(o.on?"":" off")+'" data-i="'+i+'"><button class="tick" data-tog="'+i+'">'+(o.on?"✓":"")+'</button>'+
+      '<div class="ic" style="background:'+c[3]+'22">'+c[1]+'</div><div class="t"><div class="n">'+esc(o.who||TYPE_LBL[o.type])+'</div>'+
+      '<div class="d">'+TYPE_LBL[o.type]+(o.card?" · "+esc(o.card):"")+(o.time?" · "+o.time:"")+(o.balance!=null?" · остаток "+money(o.balance):"")+'</div>'+
+      (o.note?'<div class="d" style="color:var(--amber)">'+esc(o.note)+'</div>':'')+
+      (o.type!=="income"?'<select class="impcat" data-cat="'+i+'">'+CATS.filter(x=>x[0]!=="save").map(x=>'<option value="'+x[0]+'"'+(x[0]===o.cat?" selected":"")+'>'+x[1]+" "+x[2]+'</option>').join("")+'</select>':'')+
+      '</div><div class="amt '+cls+'">'+sign+money(o.amount)+'</div></div>'}).join("");
+  const n=impOps.filter(o=>o.on).length;
+  $("impSave").textContent=n?"Добавить "+n+" "+plural(n,"операцию","операции","операций"):"Обновить только остатки";
+  const cards=[...new Set(impOps.filter(o=>o.card&&o.balance!=null).map(o=>o.card))];
+  $("impHint").textContent=cards.length?"Остатки обновятся по "+plural(cards.length,"карте","картам","картам")+": "+cards.join(", "):"";
+}
+const plural=(n,a,b,c)=>{const m10=n%10,m100=n%100;return m10===1&&m100!==11?a:m10>=2&&m10<=4&&(m100<10||m100>=20)?b:c};
+function saveImport(){
+  const base=impDate();let added=0;const keys=[];const touched=new Set();
+  state.incomes=state.incomes||{};state.cards=state.cards||{};
+  impOps.forEach(o=>{
+    const date=o.date||base;
+    if(o.card&&o.balance!=null){const at=date+"T"+(o.time||"00:00");const c=state.cards[o.card];
+      if(!c||c.at<=at)state.cards[o.card]={balance:o.balance,at,name:(c&&c.name)||""}}
+    if(!o.on)return;
+    const k=date.slice(0,7);
+    if(o.type==="income"){(state.incomes[k]=state.incomes[k]||[]).push({id:uid(),date,time:o.time,amount:o.amount,who:o.who,card:o.card,t:Date.now()})}
+    else{(state.months[k]=state.months[k]||[]).push({id:uid(),date,amount:o.amount,cat:o.cat,note:o.who,card:o.card,time:o.time,t:Date.now()});touched.add(k)}
+    keys.push(opKey(o));added++});
+  impOps.filter(o=>!o.on&&!o.dupe).forEach(o=>keys.push(opKey(o)));
+  markSeen(keys);saveLocal();closeSheet();render();
+  toast(added?"Добавлено: "+added+" ✓":"Остатки обновлены")}
 async function pasteSms(){
-  let text="";
-  try{text=await navigator.clipboard.readText()}catch(e){}
+  let text="";try{text=await navigator.clipboard.readText()}catch(e){}
   if(!text){$("smsBox").classList.remove("hidden");$("smsTa").focus();toast("Вставьте текст SMS в поле");return}
-  fillFromSms(text)}
-// ссылка вида #sms=<текст> (если «Кошелёк» открыт в Safari)
+  openImport(text)}
 (function(){const h=location.hash.slice(1);if(!/(^|&)sms=/.test(h))return;
   const t=new URLSearchParams(h).get("sms")||"";try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}
-  if(t)setTimeout(()=>{if(fillFromSms(t)){}},500)})();
-
+  if(t)setTimeout(()=>openImport(t),500)})();
 $("smsBtn").onclick=pasteSms;
-$("smsParse").onclick=()=>{const t=$("smsTa").value;if(fillFromSms(t)){$("smsBox").classList.add("hidden");$("smsTa").value=""}};
-$("smsDemo").onclick=()=>{closeSheet();setTimeout(()=>fillFromSms("MIR-4417 14:32 Покупка 846.50р PYATEROCHKA 1234 Баланс: 23 410.12р"),300)};
+$("smsParse").onclick=()=>{const t=$("smsTa").value;if(openImport(t)){$("smsBox").classList.add("hidden");$("smsTa").value=""}};
+$("impList").addEventListener("click",e=>{const b=e.target.closest("[data-tog]");if(!b)return;const o=impOps[+b.dataset.tog];o.on=!o.on;renderImp()});
+$("impList").addEventListener("change",e=>{const s=e.target.closest("[data-cat]");if(s)impOps[+s.dataset.cat].cat=s.value});
+$("impDays").onclick=e=>{const b=e.target.closest("[data-impd]");if(!b)return;impDay=b.dataset.impd;if(impDay==="pick"&&!$("impDate").value)$("impDate").value=ymd(new Date());renderImp()};
+$("impDate").onchange=renderImp;
+$("impSave").onclick=saveImport;
+$("impPaste").onclick=pasteSms;
+$("smsDemo").onclick=()=>{closeSheet();setTimeout(()=>openImport("Счёт карты MIR-4816 17:07 зачисление 20 000р ATM 60200320 Баланс: 20 239.27р\nСЧЁТ4636 17:13 Перевод по СБП из Т-Банк +6200р от ЯРОСЛАВ Я. Баланс: 6439.27р\nСЧЁТ4636 17:14 перевод 6349.90р Баланс: 89.37р\nСчёт карты MIR-2157 17:14 зачисление 6349.90р Баланс: 3602.46р\nСчёт карты MIR-4816 19:17 Покупка по СБП 66.99р J611 Пятерочка Баланс: 22.38р"),300)};
+
 
 // toast
 let tt=null;
