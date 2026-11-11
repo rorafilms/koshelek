@@ -359,6 +359,11 @@ body .aib{display:grid} body .aicard{display:block}
 .cardrow:first-child{border-top:0}
 .cardrow .cc{width:40px;height:28px;border-radius:7px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:9.5px;font-weight:700;display:grid;place-items:center;flex:none}
 .cardrow .t{flex:1;min-width:0}.cardrow .d{font-size:12px;color:var(--muted)}
+.kv{display:flex;align-items:center;gap:8px;margin:8px 0;font-size:13px}
+.kv span{width:52px;color:var(--muted);flex:none}
+.kv code{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:var(--fill);padding:7px 9px;border-radius:9px;font-size:12px;-webkit-user-select:all;user-select:all}
+.kv .chip{padding:6px 10px;font-size:12px}
+.setsec code{font-size:12px;background:var(--fill);padding:1px 5px;border-radius:5px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -594,17 +599,24 @@ body .aib{display:grid} body .aicard{display:block}
     <div class="keyok hidden" id="keyOk">✓ GigaChat подключён</div>
   </div>
   <div class="setsec">
-    <h5>📩 Траты из SMS банка</h5>
-    <p>Если банк присылает SMS о покупках, iPhone может сам копировать их — а вы добавите трату одним нажатием «📋 Из SMS».</p>
-    <details><summary>Как настроить (2 минуты)</summary>
-      <p><b>1.</b> Откройте приложение <b>«Команды»</b> → вкладка <b>«Автоматизация»</b> → <b>«+»</b> → <b>«Сообщение»</b>.</p>
-      <p><b>2.</b> «Отправитель» — выберите номер банка (Сбер — <b>900</b>, Т-Банк — <b>Tinkoff</b> или <b>T-Bank</b>, Альфа — <b>Alfa-Bank</b>, ВТБ — <b>VTB</b>). «Сообщение содержит» — можно оставить пустым.</p>
-      <p><b>3.</b> Выберите <b>«Запускать немедленно»</b> → «Далее» → «Новая пустая команда».</p>
-      <p><b>4.</b> Добавьте действие <b>«Скопировать в буфер обмена»</b> и в нём выберите <b>«Ввод быстрой команды»</b> (текст сообщения).</p>
-      <p><b>5.</b> По желанию добавьте <b>«Показать уведомление»</b> с текстом «Трата скопирована — открой Кошелёк». Готово.</p>
-      <p>Пришла SMS → откройте «Кошелёк» → «+» → <b>«📋 Из SMS»</b> → проверьте → «Сохранить». Можно и без команды: скопируйте SMS вручную.</p>
+    <h5>📩 SMS банка — автоматически</h5>
+    <p>iPhone сам отправляет каждую SMS банка в ваш личный ящик, а «Кошелёк» при открытии забирает новые операции: траты, поступления и остатки по картам. Ничего копировать не нужно.</p>
+    <div class="kv"><span>Адрес</span><code id="boxUrl"></code><button class="chip" data-copy="boxUrl">Копировать</button></div>
+    <div class="kv"><span>code</span><code id="boxCode"></code><button class="chip" data-copy="boxCode">Копировать</button></div>
+    <div class="kv"><span>box</span><code id="boxId"></code><button class="chip" data-copy="boxId">Копировать</button></div>
+    <details><summary>Как настроить на iPhone (5 минут)</summary>
+      <p><b>1.</b> Приложение <b>«Команды»</b> → вкладка <b>«Автоматизация»</b> → <b>«+»</b> → <b>«Сообщение»</b>.</p>
+      <p><b>2.</b> <b>«Отправитель»</b> — номер банка: Сбер — <b>900</b> (Т-Банк — Tinkoff/T-Bank, Альфа — Alfa-Bank, ВТБ — VTB). Выберите <b>«Запускать немедленно»</b> → «Далее» → <b>«Новая пустая команда»</b>.</p>
+      <p><b>3.</b> Добавьте действие <b>«Получить содержимое URL»</b>. В поле URL вставьте <b>Адрес</b> (кнопка «Копировать» выше).</p>
+      <p><b>4.</b> Нажмите стрелку <b>«›»</b> в действии: <b>Метод — POST</b>, <b>Тело запроса — JSON</b>. Добавьте 4 поля типа «Текст»:<br>
+      • <b>action</b> = <code>inbox_put</code><br>• <b>code</b> = значение «code» выше<br>• <b>box</b> = значение «box» выше<br>
+      • <b>sms</b> = нажмите на значение → выберите переменную <b>«Ввод быстрой команды»</b> (это текст SMS).</p>
+      <p><b>5.</b> Готово. Отправьте себе тест: дождитесь любой SMS от банка и откройте «Кошелёк» — появится окно с операциями.</p>
+      <p>Важно: у каждого человека свой «box» — его видно в настройках «Кошелька» на его телефоне.</p>
     </details>
-    <button class="btn soft sm" id="smsDemo" style="margin-top:10px">Попробовать на примере</button>
+    <button class="btn soft sm" id="boxCheck" style="margin-top:10px">Проверить ящик сейчас</button>
+    <p style="margin:12px 0 4px">Без настройки тоже можно: скопируйте SMS → «+» → «📋 Из SMS».</p>
+    <button class="btn soft sm" id="smsDemo">Попробовать на примере</button>
   </div>
   <div class="setsec">
     <h5>👨‍👩‍👧 Поделиться с близкими</h5>
@@ -1255,7 +1267,7 @@ $("aiIn").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isC
 $("aiClear").onclick=()=>{if(aiBusy&&aiCtl)aiCtl.abort();aiTurns=[];renderChat()};
 
 // ---------- settings ----------
-function openSet(){$("srvIn").value=srvUrl();$("codeIn").value=srvCode();paintAiState();openSheet("shSet")}
+function openSet(){paintBox();$("srvIn").value=srvUrl();$("codeIn").value=srvCode();paintAiState();openSheet("shSet")}
 function paintAiState(){$("keyOk").classList.toggle("hidden",!aiOn())}
 $("setOpen").onclick=openSet;
 $("keySave").onclick=async()=>{const u=$("srvIn").value.trim(),c=$("codeIn").value.trim();
@@ -1349,11 +1361,16 @@ function seenSet(){try{return new Set(JSON.parse(localStorage.getItem(SMS_SEEN)|
 function markSeen(keys){try{const a=[...seenSet(),...keys];localStorage.setItem(SMS_SEEN,JSON.stringify(a.slice(-600)))}catch(e){}}
 
 // ---- импорт: экран проверки ----
-let impOps=[],impDay="today";
+let impOps=[],impDay="today",impInbox=null;
 function impDate(){if(impDay==="yday"){const d=new Date();d.setDate(d.getDate()-1);return ymd(d)}if(impDay==="pick")return $("impDate").value||ymd(new Date());return ymd(new Date())}
-function openImport(text){
-  const parts=splitSms(text);const ops=parts.map(parseOne).filter(Boolean);
-  if(!ops.length){toast(parts.length?"Не нашёл операций в тексте":"Пустой текст");return false}
+function openImport(text,inboxItems){
+  let ops;
+  if(inboxItems){ops=[];inboxItems.forEach(it=>{const d=new Date(it.at);splitSms(it.text).map(parseOne).filter(Boolean).forEach(o=>{
+      if(!o.date){o.date=ymd(d);o.smsDate=o.date}if(!o.time)o.time=pad(d.getHours())+":"+pad(d.getMinutes());ops.push(o)})})}
+  else ops=splitSms(text).map(parseOne).filter(Boolean);
+  const parts=ops;
+  impInbox=inboxItems?inboxItems.map(i=>i.id):null;
+  if(!ops.length){if(impInbox)inboxAck(impInbox);else toast(text&&text.trim()?"Не нашёл операций в тексте":"Пустой текст");return false}
   const seen=seenSet();
   ops.forEach(o=>{o.on=true;o.note="";o.dupe=false});
   // переводы между своими счетами: исходящий перевод и зачисление той же суммы в течение 30 минут
@@ -1400,6 +1417,7 @@ function saveImport(){
     keys.push(opKey(o));added++});
   impOps.filter(o=>!o.on&&!o.dupe).forEach(o=>keys.push(opKey(o)));
   markSeen(keys);saveLocal();closeSheet();render();
+  if(impInbox){inboxAck(impInbox);impInbox=null}
   toast(added?"Добавлено: "+added+" ✓":"Остатки обновлены")}
 async function pasteSms(){
   let text="";try{text=await navigator.clipboard.readText()}catch(e){}
@@ -1408,6 +1426,28 @@ async function pasteSms(){
 (function(){const h=location.hash.slice(1);if(!/(^|&)sms=/.test(h))return;
   const t=new URLSearchParams(h).get("sms")||"";try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}
   if(t)setTimeout(()=>openImport(t),500)})();
+// ---- автоматический ящик SMS на сервере ----
+const BOX_LS="koshelek.box";
+function myBox(){let b=lsGet(BOX_LS);if(!/^[a-z0-9]{12,40}$/.test(b)){const a=new Uint8Array(10);crypto.getRandomValues(a);b=[...a].map(x=>"abcdefghjkmnpqrstuvwxyz23456789"[x%31]).join("")+"k5";lsSet(BOX_LS,b)}return b}
+async function inboxCall(body){const r=await fetch(srvUrl(),{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({code:srvCode(),box:myBox(),...body})});
+  let d=null;try{d=await r.json()}catch(_){}if(!r.ok)throw{code:(d&&d.error)||"server"};return d}
+async function inboxAck(ids){try{if(ids&&ids.length)await inboxCall({action:"inbox_ack",ids})}catch(e){}}
+let inboxBusy=false,inboxLast=0;
+async function checkInbox(manual){
+  if(!aiOn()||inboxBusy)return;if(!manual&&Date.now()-inboxLast<15000)return;
+  inboxBusy=true;inboxLast=Date.now();
+  try{const d=await inboxCall({action:"inbox_get"});const items=(d&&d.items)||[];
+    if(items.length){if(sheet&&sheet.id!=="shImp"&&!manual){/* не мешаем открытой шторке */}else openImport("",items)}
+    else if(manual)toast("Новых SMS нет — ящик работает ✓");
+    if(manual)lsSet("koshelek.boxon","1")}
+  catch(e){if(manual)toast(e.code==="inbox_cfg"?"Ящик на сервере ещё не настроен":"Сервер не ответил")}
+  finally{inboxBusy=false}}
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)setTimeout(()=>checkInbox(false),400)});
+setTimeout(()=>checkInbox(false),1200);
+function paintBox(){$("boxId").textContent=myBox();$("boxUrl").textContent=srvUrl()||"— сервер советника не подключён —";$("boxCode").textContent=srvCode()||"—"}
+$("boxCheck").onclick=()=>checkInbox(true);
+document.addEventListener("click",async e=>{const b=e.target.closest("[data-copy]");if(!b)return;const v=$(b.dataset.copy).textContent;
+  try{await navigator.clipboard.writeText(v);toast("Скопировано: "+(v.length>24?v.slice(0,24)+"…":v))}catch(_){toast(v)}});
 $("smsBtn").onclick=pasteSms;
 $("smsParse").onclick=()=>{const t=$("smsTa").value;if(openImport(t)){$("smsBox").classList.add("hidden");$("smsTa").value=""}};
 $("impList").addEventListener("click",e=>{const b=e.target.closest("[data-tog]");if(!b)return;const o=impOps[+b.dataset.tog];o.on=!o.on;renderImp()});
