@@ -439,6 +439,9 @@ html,body{font-family:Poppins,-apple-system,BlinkMacSystemFont,"SF Pro Text","Se
 .chartwrap .xl{font-size:10.5px;fill:var(--muted);font-family:inherit}
 .chartwrap .xl.on{fill:var(--ink);font-weight:700}
 
+.brand-logo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit;background:#fff;padding:6px;z-index:2}
+.gi:has(.brand-logo) b{display:none}
+@supports not selector(:has(*)){.gi .brand-logo~b{display:none}}
 /* merchant badge */
 .mono{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex:none;color:#fff;font-weight:800;font-size:13px;letter-spacing:-.02em;text-transform:uppercase}
 
@@ -2026,9 +2029,17 @@ const BRANDS=[
 function brandOf(t){t=String(t||"");for(const [re,name,cat] of BRANDS)if(re.test(t))return {name,cat};return null}
 function initials(n){const w=String(n||"?").replace(/[^\wА-Яа-яЁё&' ]/g," ").trim().split(/\s+/).filter(Boolean);
   if(!w.length)return "?";return (w.length===1?w[0].slice(0,2):w[0][0]+w[1][0])}
+const BRAND_DOMAINS={
+ "Пятёрочка":"5ka.ru","Магнит":"magnit.ru","Перекрёсток":"perekrestok.ru","Чижик":"chizhik.store","ВкусВилл":"vkusvill.ru","Лента":"lenta.com","Ашан":"auchan.ru","Дикси":"dixy.ru","Красное&Белое":"krasnoeibeloe.ru","Fix Price":"fix-price.com","Самокат":"samokat.ru","Яндекс Лавка":"lavka.yandex.ru","METRO":"online.metro-cc.ru","О'кей":"okmarket.ru","Лидл":"lidl.com","Lidl":"lidl.com","Aldi":"aldi.com","REWE":"rewe.de","EDEKA":"edeka.de","Kaufland":"kaufland.com","Penny":"penny.de","Carrefour":"carrefour.com","Tesco":"tesco.com","Sainsbury's":"sainsburys.co.uk","Biedronka":"biedronka.pl","Mercadona":"mercadona.es","Albert Heijn":"ah.nl","Jumbo":"jumbo.com","Billa":"billa.at","Migros":"migros.ch","Coop":"coop.ch","dm":"dm.de","Rossmann":"rossmann.de","Żabka":"zabka.pl",
+ "Вкусно — и точка":"vkusnoitochka.ru","Rostic's":"rostics.ru","Бургер Кинг":"burgerking.ru","McDonald's":"mcdonalds.com","Додо Пицца":"dodopizza.ru","Шоколадница":"shoko.ru","Теремок":"teremok.ru","Cofix":"cofix.global","Starbucks":"starbucks.com","Stars Coffee":"starscoffee.ru","Surf Coffee":"surfcoffee.ru","Яндекс Еда":"eda.yandex.ru","Subway":"subway.com","Costa Coffee":"costa.co.uk","Pret":"pret.com",
+ "Яндекс Go":"go.yandex","Uber":"uber.com","Bolt":"bolt.eu","РЖД":"rzd.ru","Аэрофлот":"aeroflot.ru","Лукойл":"lukoil.ru","Газпромнефть":"gpnbonus.ru","Роснефть":"rosneft.ru","Shell":"shell.com","Делимобиль":"delimobil.ru","Whoosh":"whoosh-bike.ru","DB Bahn":"bahn.de","Ryanair":"ryanair.com","Wizz Air":"wizzair.com","FlixBus":"flixbus.com",
+ "Wildberries":"wildberries.ru","Ozon":"ozon.ru","Яндекс Маркет":"market.yandex.ru","AliExpress":"aliexpress.com","Lamoda":"lamoda.ru","Zara":"zara.com","H&M":"hm.com","Спортмастер":"sportmaster.ru","IKEA":"ikea.com","OBI":"obi.ru","М.Видео":"mvideo.ru","Эльдорадо":"eldorado.ru","DNS":"dns-shop.ru","Кинопоиск":"kinopoisk.ru","Яндекс Плюс":"plus.yandex.ru","Okko":"okko.tv","Иви":"ivi.ru","Spotify":"spotify.com","Netflix":"netflix.com","Steam":"steampowered.com","PlayStation":"playstation.com"
+};
 function mono(name,cat,cls){const c=CAT[cat]||CAT.other;const b=brandOf(name);
   if(!b)return cgi(cat,cls);
-  return '<span class="gi mono'+(cls?" "+cls:"")+'" style="--g1:'+c[4]+';--g2:'+c[3]+'"><b>'+esc(initials(b.name))+'</b></span>'}
+  const domain=BRAND_DOMAINS[b.name];
+  const img=domain?'<img class="brand-logo" src="https://www.google.com/s2/favicons?domain='+domain+'&sz=128" alt="" loading="lazy" decoding="async" onerror="this.remove()">':'';
+  return '<span class="gi mono'+(cls?" "+cls:"")+'" style="--g1:'+c[4]+';--g2:'+c[3]+'"><b>'+esc(initials(b.name))+'</b>'+img+'</span>'}
 
 // ================= КАРТЫ: карусель =================
 const CARD_COLORS=["orange","navy","green","yellow","violet","red"];
