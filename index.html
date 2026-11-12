@@ -950,7 +950,7 @@ svg.i{width:20px;height:20px;flex:none;display:block}
   </div>
   <div class="setsec">
     <h5>SMS банка — автоматически</h5>
-    <p>iPhone сам отправляет каждую SMS банка в ваш личный ящик, а «Кошелёк» при открытии забирает новые операции: траты, поступления и остатки по картам. Ничего копировать не нужно.</p>
+    <p>Автоматизация на iPhone отправляет текст банковской SMS на указанный сервер. «Кошелёк» забирает её при открытии приложения и предлагает проверить операции. Записи хранятся в браузере на устройстве, но исходные SMS проходят через сервер. Убедитесь, что доверяете владельцу сервера и его правилам хранения. Не пересылайте SMS с одноразовыми кодами, паролями или полными данными карты.</p>
     <div class="kv"><span>Адрес</span><code id="boxUrl"></code><button class="chip" data-copy="boxUrl">Копировать</button></div>
     <div class="kv"><span>code</span><code id="boxCode"></code><button class="chip" data-copy="boxCode">Копировать</button></div>
     <div class="kv"><span>box</span><code id="boxId"></code><button class="chip" data-copy="boxId">Копировать</button></div>
@@ -1874,6 +1874,7 @@ function parseOne(raw){
   if(plus||/зачислен|поступлен|пополнен|возврат|отмен|cashback|кешб|кэшб/.test(op)||/перевод\S* (?:по сбп )?(?:из|от)(?![а-яё])/.test(op)||/(?:^|\s)от\s+[А-ЯЁA-Z]/.test(after))type="income";
   else if(/перевод/.test(op))type="transfer";
   else if(!/покупк|оплат|списан|выдача|снят/.test(op)&&!/покупк|оплат|списан/i.test(t))return null;
+  const loanPayment=/(?:погашени[ея]|плат[её]ж|оплат[аы]|списани[ея])[^]{0,35}(?:кредит|задолженн|кредитн[а-яё ]*карт)|(?:кредит|задолженн)[^]{0,35}(?:плат[её]ж|погашени[ея]|списани[ея])/i.test(t);
   // контрагент
   let who=after.split(/(?:баланс|доступно|остаток|balance|dostupno)/i)[0]
     .replace(/(?:MIR|VISA|ECMC|MC)-?\d{4}|\*\d{4}|карт[аы]?\s*\*?\d{4}/gi," ").replace(/["«»]/g,"").replace(/\s+/g," ").trim().replace(/[.,;:\s-]+$/,"");
@@ -1885,7 +1886,7 @@ function parseOne(raw){
   const pretty=(/[a-zа-яё]/.test(who)?who:titleCase(who)).replace(/^(Ип|Ооо|Зао|Пао|Оао)(?=\s)/,x=>x.toUpperCase()).replace(/\.$/,"");
   const br=type==="spend"?brandOf(who+" "+t):null;
   const cat=type==="spend"?(br?br.cat:guessCat(who+" "+t)):type==="transfer"?"transfer":"income";
-  return {raw:t,type,amount:Math.round(amount*100)/100,who:br?br.name:pretty,cat,card,time,date,smsDate:date,balance,cash:/внесение наличных/i.test(pretty)}}
+  return {raw:t,type,amount:Math.round(amount*100)/100,who:br?br.name:pretty,cat,card,time,date,smsDate:date,balance,loanPayment,cash:/внесение наличных/i.test(pretty)}}
 window.__parseSms=parseOne;
 
 function opKey(o){return [o.card,o.smsDate||"",o.time,o.type,o.amount].join("|")}
@@ -1927,7 +1928,7 @@ function renderImp(){
     return '<div class="imp'+(o.on?"":" off")+'" data-i="'+i+'"><button class="tick" data-tog="'+i+'">'+(o.on?ico("check"):"")+'</button>'+
       cgi(o.type==="income"?"income":o.type==="transfer"?"transfer":o.cat)+'<div class="t"><div class="n">'+esc(o.who||TYPE_LBL[o.type])+'</div>'+
       '<div class="d">'+TYPE_LBL[o.type]+(o.card?" · "+esc(o.card):"")+(o.time?" · "+o.time:"")+(o.balance!=null?" · остаток "+money(o.balance):"")+'</div>'+
-      (o.note?'<div class="d" style="color:var(--amber)">'+esc(o.note)+'</div>':'')+
+      (o.loanPayment?'<div class="d" style="color:var(--amber)">Похоже на платёж по кредиту: сверьте остаток долга вручную</div>':'')+(o.note?'<div class="d" style="color:var(--amber)">'+esc(o.note)+'</div>':'')+
       (o.type!=="income"?'<select class="impcat" data-cat="'+i+'">'+PICK.map(x=>'<option value="'+x[0]+'"'+(x[0]===o.cat?" selected":"")+'>'+x[2]+'</option>').join("")+'</select>':'')+
       '</div><div class="amt '+cls+'">'+sign+money(o.amount)+'</div></div>'}).join("");
   const n=impOps.filter(o=>o.on).length;
@@ -1945,8 +1946,8 @@ function saveImport(){
       if(!c||c.at<=at)state.cards[o.card]={balance:o.balance,at,name:(c&&c.name)||""}}
     if(!o.on)return;
     const k=date.slice(0,7);
-    if(o.type==="income"){(state.incomes[k]=state.incomes[k]||[]).push({id:uid(),date,time:o.time,amount:o.amount,who:o.who,card:o.card,t:Date.now()})}
-    else{(state.months[k]=state.months[k]||[]).push({id:uid(),date,amount:o.amount,cat:o.cat,note:o.who,card:o.card,time:o.time,t:Date.now()});touched.add(k)}
+    if(o.type==="income"){(state.incomes[k]=state.incomes[k]||[]).push({id:uid(),date,time:o.time,amount:o.amount,who:o.who,card:o.card,source:"sms",t:Date.now()})}
+    else{(state.months[k]=state.months[k]||[]).push({id:uid(),date,amount:o.amount,cat:o.cat,note:o.who,card:o.card,time:o.time,source:"sms",loanPayment:!!o.loanPayment,t:Date.now()});touched.add(k)}
     keys.push(opKey(o));added++});
   impOps.filter(o=>!o.on&&!o.dupe).forEach(o=>keys.push(opKey(o)));
   markSeen(keys);saveLocal();closeSheet();render();
