@@ -7,9 +7,11 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Кошелёк">
-<meta name="theme-color" content="#F2F3F8" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0A0A0F" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#FFF8E1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0A1A2F" media="(prefers-color-scheme: dark)">
 <title>Кошелёк — простой бюджет</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -364,6 +366,136 @@ body .aib{display:grid} body .aicard{display:block}
 .kv code{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:var(--fill);padding:7px 9px;border-radius:9px;font-size:12px;-webkit-user-select:all;user-select:all}
 .kv .chip{padding:6px 10px;font-size:12px}
 .setsec code{font-size:12px;background:var(--fill);padding:1px 5px;border-radius:5px}
+/* ================== ТЕМА «ОРАНЖЕВЫЙ / ЖЁЛТЫЙ / ТЁМНО-СИНИЙ» ================== */
+:root{
+  --bg:#FFF8E6; --ink:#0B2545; --muted:#6B7A90; --faint:#A9B4C4;
+  --card:#FFFFFF; --glass:rgba(255,255,255,.86); --glass-b:rgba(11,37,69,.06);
+  --line:rgba(11,37,69,.08); --fill:rgba(11,37,69,.05); --fill2:rgba(11,37,69,.09);
+  --accent:#FF6B1A; --accent2:#FF8A1F; --yellow:#FFD21F; --navy:#0B2545; --navy2:#13335C;
+  --green:#14A06B; --red:#E5484D; --amber:#E58A00;
+  --accent-s:rgba(255,107,26,.12); --yellow-s:rgba(255,210,31,.22);
+  --shadow:0 2px 6px rgba(11,37,69,.04),0 10px 30px rgba(11,37,69,.06);
+  --r:24px;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0A1A2F;--ink:#F3F6FB;--muted:#93A3BA;--faint:#5B6E88;--card:#122A47;--glass:rgba(18,42,71,.9);--glass-b:rgba(255,255,255,.06);
+    --line:rgba(255,255,255,.08);--fill:rgba(255,255,255,.06);--fill2:rgba(255,255,255,.11);--navy:#061224;--navy2:#0E2340;--shadow:none}
+}
+html,body{font-family:Poppins,-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif}
+.bg{display:none}
+.ttl{font-weight:800;font-size:30px;letter-spacing:-.02em}
+.brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:19px;margin:4px 4px 14px;letter-spacing:-.01em}
+.bdot{width:14px;height:14px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px var(--accent-s)}
+.card,.stat{background:var(--card);border:0;box-shadow:var(--shadow);backdrop-filter:none;-webkit-backdrop-filter:none}
+.card h3{font-weight:700}
+.sect{display:flex;justify-content:space-between;align-items:baseline;margin:20px 6px 10px;font-weight:700;font-size:16px}
+.sect small{color:var(--muted);font-weight:500;font-size:13px}
+.seeall{color:var(--accent);font-weight:600;font-size:14px}
+.top::before{background:var(--bg);backdrop-filter:none;-webkit-backdrop-filter:none}
+.mpill,.gear,.sync{background:var(--card);border:0;box-shadow:var(--shadow)}
+.aib{background:var(--yellow);color:var(--navy);box-shadow:0 6px 16px -6px rgba(229,170,0,.7)}
+
+/* hero */
+.hero{background:var(--accent);box-shadow:0 18px 40px -16px rgba(255,107,26,.7);border-radius:28px;padding:22px 20px}
+.hero::after{display:none}
+.hero .hcirc{position:absolute;right:-90px;top:-70px;width:250px;height:250px;border-radius:50%;background:var(--navy);opacity:.95}
+.hero .harc{position:absolute;left:-40px;bottom:-120px;width:320px;height:200px;border-radius:50%;border:2px solid var(--yellow);opacity:.8}
+.hero .row1,.hero .chips{position:relative;z-index:1}
+.hero .big{font-weight:800;font-size:44px}
+.hero .lbl{font-weight:500}
+.hero .chips span{background:rgba(255,255,255,.2);font-weight:500}
+.hero.bad{background:#E5484D}
+.ring .tr{stroke:rgba(255,255,255,.25)}.ring .pr{stroke:var(--yellow)}
+
+/* card rail */
+.cardrail{display:flex;gap:12px;overflow-x:auto;margin:0 -16px 6px;padding:2px 16px 14px;scroll-snap-type:x mandatory;scrollbar-width:none;touch-action:pan-x}
+.cardrail::-webkit-scrollbar{display:none}
+.bcard{flex:none;width:208px;height:126px;border-radius:20px;padding:14px 16px;color:#fff;position:relative;overflow:hidden;scroll-snap-align:start;text-align:left;
+  box-shadow:0 10px 24px -12px rgba(11,37,69,.45);transition:transform .3s var(--spring)}
+.bcard:active{transform:scale(.96)}
+.bcard::before{content:"";position:absolute;right:-50px;bottom:-60px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.14)}
+.bcard::after{content:"";position:absolute;left:-30px;bottom:-80px;width:200px;height:120px;border-radius:50%;border:1.5px solid rgba(255,255,255,.35)}
+.bcard .no{font-size:11.5px;opacity:.85;font-weight:500;letter-spacing:.04em}
+.bcard .nm{font-size:12.5px;opacity:.95;font-weight:600;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bcard .bl{font-size:23px;font-weight:800;margin-top:12px;letter-spacing:-.02em;position:relative;z-index:1}
+.bcard .ft{position:absolute;left:16px;bottom:12px;font-size:11px;opacity:.85;z-index:1}
+.bcard .tag{position:absolute;right:12px;top:12px;background:#fff;color:var(--navy);font-size:9.5px;font-weight:800;padding:3px 6px;border-radius:5px;z-index:1}
+.bcard.c-orange{background:var(--accent)}.bcard.c-navy{background:var(--navy2)}.bcard.c-green{background:#13A57A}.bcard.c-yellow{background:var(--yellow);color:var(--navy)}
+.bcard.c-red{background:#D94141}.bcard.c-violet{background:#6A4CE0}
+.bcard.add{width:70px;height:auto;align-self:stretch;background:var(--fill2);color:var(--muted);display:grid;place-items:center;font-size:34px;font-weight:300;box-shadow:none}
+.bcard.add::before,.bcard.add::after{display:none}
+.bcard.debt{height:140px}
+.bcard .prog{position:absolute;left:16px;right:16px;bottom:31px;height:5px;border-radius:3px;background:rgba(255,255,255,.25);z-index:1}
+.bcard .prog i{display:block;height:100%;border-radius:3px;background:var(--yellow)}
+
+/* chart */
+.chartcard{padding:14px 12px 10px}
+.seg.mini{max-width:280px;margin:0 auto 6px;background:transparent}
+.seg.mini .ind{background:var(--fill2);box-shadow:none}
+.seg.mini button{font-size:13px;padding:6px}
+.chartwrap{position:relative;height:190px;touch-action:pan-y}
+.chartwrap svg{width:100%;height:100%;overflow:visible}
+.chartwrap .bub{position:absolute;transform:translate(-50%,-130%);background:var(--card);box-shadow:var(--shadow);border-radius:10px;padding:5px 9px;font-size:12px;font-weight:700;white-space:nowrap;pointer-events:none;transition:left .3s var(--ease),top .3s var(--ease)}
+.chartwrap .xl{font-size:10.5px;fill:var(--muted);font-family:inherit}
+.chartwrap .xl.on{fill:var(--ink);font-weight:700}
+
+/* merchant badge */
+.mono{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex:none;color:#fff;font-weight:800;font-size:13px;letter-spacing:-.02em;text-transform:uppercase}
+
+/* buttons: yellow primary with orange dot */
+.btn{background:var(--yellow);color:var(--navy);box-shadow:0 10px 22px -12px rgba(200,150,0,.7);font-weight:700}
+.btn::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent);margin-left:6px}
+.btn.soft::after,.btn.icon::after,.btn.danger::after,.btn.sm.noDot::after{display:none}
+.btn.soft{background:var(--fill)}
+.fab{background:var(--yellow);color:var(--navy);box-shadow:0 12px 26px -8px rgba(229,170,0,.8)}
+.chip.on{background:var(--navy);color:#fff}
+@media (prefers-color-scheme:dark){.chip.on{background:var(--yellow);color:var(--navy)}}
+.tick{border-color:var(--accent)}.imp:not(.off) .tick{background:var(--accent)}
+
+/* tabbar */
+.tabbar{background:var(--card);border:0;box-shadow:0 10px 30px rgba(11,37,69,.12);backdrop-filter:none;-webkit-backdrop-filter:none}
+.tabbar .ind{background:var(--accent-s)}
+.tabbar button.on{color:var(--accent)}
+
+/* navy summary card */
+.navycard{background:var(--navy);color:#fff;border-radius:24px;padding:18px;margin-bottom:12px;position:relative;overflow:hidden;box-shadow:0 16px 36px -18px rgba(11,37,69,.8)}
+.navycard::after{content:"";position:absolute;right:-60px;top:-60px;width:180px;height:180px;border-radius:50%;background:var(--accent);opacity:.9}
+.navycard>*{position:relative;z-index:1}
+.navycard .k{font-size:13px;opacity:.8}
+.navycard .v{font-size:32px;font-weight:800;letter-spacing:-.02em;margin:2px 0 10px}
+.navycard .row3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.navycard .row3 div{background:rgba(255,255,255,.08);border-radius:14px;padding:9px 10px;font-size:11.5px;opacity:.95}
+.navycard .row3 b{display:block;font-size:15px;margin-top:2px}
+
+/* debts */
+.alert{display:flex;gap:12px;align-items:flex-start;background:var(--yellow-s);border-radius:18px;padding:13px 14px;margin-bottom:10px;font-size:14px}
+.alert .e{font-size:20px}
+.alert b{display:block;margin-bottom:2px}
+.alert.hot{background:rgba(229,72,77,.12)}
+.extra{display:flex;align-items:center;gap:12px}
+.extra input{flex:1;accent-color:var(--accent);height:28px}
+.extra b{min-width:96px;text-align:right;font-size:18px}
+.resgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.resgrid div{background:var(--fill);border-radius:16px;padding:11px 12px;font-size:12.5px;color:var(--muted)}
+.resgrid b{display:block;color:var(--ink);font-size:17px;margin-top:2px}
+.resgrid .good b{color:var(--green)}
+.order{counter-reset:o}
+.order .row::before{counter-increment:o;content:counter(o);width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center;flex:none}
+
+/* tips */
+.split{display:flex;height:14px;border-radius:8px;overflow:hidden;margin:6px 0 12px;background:var(--fill)}
+.split i{display:block;height:100%;transition:flex-grow .8s var(--ease)}
+.legrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.legrow:first-of-type{border-top:0}
+.legrow .sw2{width:12px;height:12px;border-radius:4px;flex:none}
+.legrow .t{flex:1}.legrow .t small{display:block;color:var(--muted);font-size:12px}
+.rule{display:flex;gap:12px;padding:10px 0;border-top:1px solid var(--line);font-size:14px}
+.rule:first-child{border-top:0}.rule .e{font-size:20px;line-height:1.2}
+.rule b{display:block}.rule span{color:var(--muted);font-size:13px}
+.totcard{display:flex;justify-content:space-between;align-items:center;padding:14px 16px}
+.totcard .amt{font-size:22px}
+.danger{background:rgba(229,72,77,.12)!important;color:#E5484D!important;box-shadow:none!important}
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -386,8 +518,9 @@ body .aib{display:grid} body .aicard{display:block}
 
   <!-- ГЛАВНАЯ -->
   <section class="view" data-v="home"><div class="inner">
-    <div class="ttl">Главная</div>
+    <div class="brand"><span class="bdot"></span>Кошелёк</div>
     <div class="hero" id="hero">
+      <i class="hcirc"></i><i class="harc"></i>
       <div class="row1">
         <div class="l">
           <div class="lbl" id="heroLbl">Можно потратить сегодня</div>
@@ -400,6 +533,21 @@ body .aib{display:grid} body .aicard{display:block}
         </div>
       </div>
       <div class="chips" id="heroChips"></div>
+    </div>
+
+    <div id="cardsCard">
+      <div class="sect"><span>Мои карты</span><small id="cardsTotal"></small></div>
+      <div class="cardrail" id="cardsList"></div>
+    </div>
+
+    <div class="card chartcard">
+      <div class="seg mini" id="chartRange"><div class="ind"></div><button data-r="week" class="on">Неделя</button><button data-r="month">Месяц</button><button data-r="year">Год</button></div>
+      <div class="chartwrap" id="chart"></div>
+    </div>
+
+    <div class="card">
+      <h3><span>Операции</span><button class="seeall" data-goto="1">Все <b>→</b></button></h3>
+      <div class="list" id="recentList"></div>
     </div>
 
     <div class="stats">
@@ -415,22 +563,12 @@ body .aib{display:grid} body .aicard{display:block}
       <div class="net" id="flowNet"></div>
     </div>
 
-    <div class="card hidden" id="cardsCard">
-      <h3>Мои карты <small id="cardsTotal"></small></h3>
-      <div id="cardsList"></div>
-    </div>
 
     <div class="tip" id="tip"></div>
 
     <div class="card aicard">
       <div class="hd"><div class="av">✨</div><div><div class="nm">ИИ-советник</div><div class="sb">Разберёт ваш бюджет и подскажет, что делать</div></div></div>
       <div class="sugs" id="homeSugs"></div>
-    </div>
-
-    <div class="card">
-      <h3>Последние 7 дней <small id="wkSum"></small></h3>
-      <div class="week" id="week"></div>
-      <div class="limitline"><i></i><span id="wkLegend">в пределах лимита</span></div>
     </div>
 
     <div class="card">
@@ -455,34 +593,61 @@ body .aib{display:grid} body .aicard{display:block}
     </div>
   </div></section>
 
-  <!-- ТРАТЫ -->
+  <!-- ОПЕРАЦИИ -->
   <section class="view" data-v="spend"><div class="inner">
-    <div class="ttl">Траты</div>
-    <div class="seg" id="spendRange"><div class="ind"></div><button data-r="day" class="on">День</button><button data-r="week">Неделя</button><button data-r="month">Месяц</button></div>
-    <div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px">
-      <span class="m" id="spTotLbl">Итого</span><b class="amt" style="font-size:22px" id="spTot">0 ₽</b>
+    <div class="ttl">Операции</div>
+    <div class="seg" id="spendMode"><div class="ind"></div><button data-sm="list" class="on">Список</button><button data-sm="cal">Календарь</button></div>
+    <div id="listBox">
+      <div class="seg mini" id="spendRange"><div class="ind"></div><button data-r="day" class="on">День</button><button data-r="week">Неделя</button><button data-r="month">Месяц</button></div>
+      <div class="card totcard"><span class="m" id="spTotLbl">Итого</span><b class="amt" id="spTot">0 ₽</b></div>
+      <div id="spendList"></div>
     </div>
-    <div id="spendList"></div>
+    <div id="calBox" class="hidden">
+      <div class="card calwrap">
+        <div class="cal" id="cal"></div>
+        <div class="legend"><span class="g">доход</span><span class="a">платёж</span><span class="r">траты</span><span class="m">в тыс. ₽</span></div>
+      </div>
+      <div class="card">
+        <h3 id="dayTitle">День</h3>
+        <div class="list" id="dayList"></div>
+      </div>
+    </div>
   </div></section>
 
-  <!-- КАЛЕНДАРЬ -->
-  <section class="view" data-v="cal"><div class="inner">
-    <div class="ttl">Календарь</div>
-    <div class="card calwrap">
-      <div class="cal" id="cal"></div>
-      <div class="legend"><span class="g">доход</span><span class="a">платёж</span><span class="r">траты</span><span class="m" style="--x:0">в тыс. ₽</span></div>
-    </div>
+  <!-- ДОЛГИ -->
+  <section class="view" data-v="debts"><div class="inner">
+    <div class="ttl">Долги</div>
+    <div class="navycard" id="debtSum"></div>
+    <div id="graceAlerts"></div>
+    <div class="sect"><span>Кредитные карты</span></div>
+    <div class="cardrail" id="ccRail"></div>
     <div class="card">
-      <h3 id="dayTitle">День</h3>
-      <div class="list" id="dayList"></div>
+      <h3><span>Кредиты</span></h3>
+      <div class="list" id="loanList"></div>
+      <button class="btn soft sm" style="margin-top:10px" data-adddebt="loan">＋ Добавить кредит</button>
+    </div>
+    <div class="card" id="stratCard">
+      <h3><span>План погашения</span></h3>
+      <div class="m" style="font-size:13px;margin:-4px 0 12px">Сколько в месяц вы готовы платить <b>сверх</b> обязательных платежей:</div>
+      <div class="extra"><input type="range" id="exRange" min="0" max="50000" step="500" value="0"><b id="exVal">0 ₽</b></div>
+      <div class="seg" id="stratSeg" style="margin-top:12px"><div class="ind"></div><button data-st="avalanche" class="on">🏔 Лавина</button><button data-st="snowball">⛄ Снежный ком</button></div>
+      <div class="m" id="stratHint" style="font-size:12.5px;margin:-4px 2px 12px"></div>
+      <div id="stratRes"></div>
+      <button class="btn sm" id="askDebt" style="margin-top:12px">✨ Спросить советника про мои долги</button>
     </div>
   </div></section>
 
-  <!-- ЦЕЛИ -->
-  <section class="view" data-v="goals"><div class="inner">
-    <div class="ttl">Цели</div>
-    <div id="goalList"></div>
-    <button class="btn" id="addGoal" style="margin-top:4px">＋ Новая цель</button>
+  <!-- СОВЕТЫ -->
+  <section class="view" data-v="tips"><div class="inner">
+    <div class="ttl">Советы</div>
+    <div class="navycard" id="tipFree"></div>
+    <div class="card" id="tipSplit"></div>
+    <div class="card" id="tipCushion"></div>
+    <div class="card" id="tipDebt"></div>
+    <div class="card">
+      <h3><span>Главные правила</span></h3>
+      <div id="tipRules"></div>
+    </div>
   </div></section>
 
   <!-- ПЛАН -->
@@ -495,10 +660,13 @@ body .aib{display:grid} body .aicard{display:block}
     </div>
     <div class="card">
       <h3><span>📌 Обязательные платежи</span><small id="fixSum"></small></h3>
-      <div class="m" style="font-size:13px;margin:-4px 0 6px">Аренда, кредиты, связь, коммуналка, подписки.</div>
+      <div class="m" style="font-size:13px;margin:-4px 0 6px">Аренда, связь, коммуналка, подписки. Кредиты удобнее вести во вкладке «Долги».</div>
       <div class="list" id="fixList"></div>
       <button class="btn soft sm" style="margin-top:10px" data-add="expense">＋ Добавить платёж</button>
     </div>
+    <div class="sect"><span>🎯 Цели</span></div>
+    <div id="goalList"></div>
+    <button class="btn" id="addGoal" style="margin-top:4px">＋ Новая цель</button>
   </div></section>
 
 </div></div>
@@ -506,9 +674,9 @@ body .aib{display:grid} body .aicard{display:block}
 <nav class="tabbar" id="tabbar">
   <div class="ind" id="tabInd"></div>
   <button data-i="0" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Главная</button>
-  <button data-i="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg>Траты</button>
-  <button data-i="2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Календарь</button>
-  <button data-i="3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>Цели</button>
+  <button data-i="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg>Операции</button>
+  <button data-i="2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M2.5 10h19M6.5 15h4"/></svg>Долги</button>
+  <button data-i="3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5c0-.9.4-1.7 1.1-2.2A6 6 0 0 0 12 3z"/></svg>Советы</button>
   <button data-i="4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6a1 1 0 0 1 1 1v1H8V5a1 1 0 0 1 1-1z"/><path d="M8 5H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-2"/><path d="M9 12h6M9 16h4"/></svg>План</button>
 </nav>
 <button class="fab" id="fab" aria-label="Добавить трату"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
@@ -640,6 +808,44 @@ body .aib{display:grid} body .aicard{display:block}
   <button class="btn" id="impSave">Добавить</button>
 </div>
 
+<div class="sheet" id="shDebt">
+  <div class="grabz"><div class="grab"></div></div>
+  <h4><span id="dbTitle">Новый кредит</span> <button class="x" data-close>✕</button></h4>
+  <div class="seg" id="dbType"><div class="ind"></div><button data-t="loan" class="on">Кредит</button><button data-t="card">Кредитная карта</button></div>
+  <div class="field"><label>Название</label><input class="inp" id="dbName" placeholder="Кредит на машину" maxlength="40"></div>
+  <div class="two">
+    <div class="field"><label id="dbBalL">Остаток долга, ₽</label><input class="inp" id="dbBal" inputmode="decimal" placeholder="0"></div>
+    <div class="field"><label>Ставка, % годовых</label><input class="inp" id="dbRate" inputmode="decimal" placeholder="например, 24,9"></div>
+  </div>
+  <div class="two">
+    <div class="field"><label id="dbMinL">Платёж в месяц, ₽</label><input class="inp" id="dbMin" inputmode="decimal" placeholder="0"></div>
+    <div class="field"><label>Число платежа</label><input class="inp" id="dbDay" inputmode="numeric" placeholder="15"></div>
+  </div>
+  <div id="dbCardF" class="hidden">
+    <div class="two">
+      <div class="field"><label>Кредитный лимит, ₽</label><input class="inp" id="dbLimit" inputmode="decimal" placeholder="100 000"></div>
+      <div class="field"><label>Льготный период, дней</label><input class="inp" id="dbGrace" inputmode="numeric" placeholder="120"></div>
+    </div>
+    <div class="field"><label>Погасить без процентов до</label><input class="inp" type="date" id="dbGraceEnd"></div>
+    <div class="m" style="font-size:12.5px;margin:-4px 4px 12px">Дату окончания льготного периода смотрите в приложении банка. Если всё погасить до неё — проценты не начислятся.</div>
+  </div>
+  <button class="btn" id="dbSave">Сохранить</button>
+  <button class="btn danger sm hidden" id="dbDel" style="margin-top:8px">Удалить</button>
+</div>
+
+<div class="sheet" id="shCard">
+  <div class="grabz"><div class="grab"></div></div>
+  <h4><span id="cdTitle">Карта</span> <button class="x" data-close>✕</button></h4>
+  <div class="field"><label>Название</label><input class="inp" id="cdName" placeholder="Сбер МИР" maxlength="30"></div>
+  <div class="two">
+    <div class="field"><label>Последние 4 цифры</label><input class="inp" id="cdNum" inputmode="numeric" maxlength="4" placeholder="4816"></div>
+    <div class="field"><label>Остаток, ₽</label><input class="inp" id="cdBal" inputmode="decimal" placeholder="0"></div>
+  </div>
+  <div class="field"><label>Цвет</label><div class="hscroll" id="cdColors" style="margin:0"></div></div>
+  <button class="btn" id="cdSave">Сохранить</button>
+  <button class="btn danger sm hidden" id="cdDel" style="margin-top:8px">Удалить карту</button>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -654,7 +860,7 @@ const EMO=["🎯","📱","✈️","🚗","🏠","💻","🎓","🛋️","💍","
 const MONTHS=["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
 const MG=["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
 const WD=["Вс","Пн","Вт","Ср","Чт","Пт","Сб"];
-const VIEWS=["home","spend","cal","goals","plan"];
+const VIEWS=["home","spend","debts","tips","plan"];
 const LS="koshelek.v1";
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -674,8 +880,8 @@ const human=s=>{const d=parse(s);return d.getDate()+" "+MG[d.getMonth()]};
 const sum=(a,f)=>a.reduce((s,x)=>s+(+f(x)||0),0);
 
 // ---------- state ----------
-let state={plans:[],months:{},goals:[],incomes:{},cards:{}};
-try{const s=JSON.parse(localStorage.getItem(LS)||"null");if(s&&Array.isArray(s.plans))state={plans:s.plans,months:s.months||{},goals:s.goals||[],incomes:s.incomes||{},cards:s.cards||{}}}catch(e){}
+let state={plans:[],months:{},goals:[],incomes:{},cards:{},debts:[]};
+try{const s=JSON.parse(localStorage.getItem(LS)||"null");if(s&&Array.isArray(s.plans))state={plans:s.plans,months:s.months||{},goals:s.goals||[],incomes:s.incomes||{},cards:s.cards||{},debts:s.debts||[]}}catch(e){}
 function saveLocal(){try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}}
 
 let today=new Date();
@@ -716,7 +922,7 @@ function render(){
   const y=cur.getFullYear(),m=cur.getMonth();
   $("mTitle").textContent=MONTHS[m]+(y!==today.getFullYear()?" "+y:"");
   const st=stats(y,m);
-  rHome(st,y,m);rFlow(st);rSpend(st);rCal(st,y,m);rGoals();rPlan();
+  rHome(st,y,m);rFlow(st);rCards();rChart();rRecent();rSpend(st);rCal(st,y,m);rGoals();rPlan();rDebts();rTips();
   firstPaint=false;
 }
 
@@ -754,16 +960,6 @@ function rHome(st,y,m){
     else{e="🐷";t="Подушка безопасности";s="Старайтесь оставлять хотя бы "+money(sv)+" (10% дохода) в месяц."}}
   $("tip").innerHTML='<div class="e">'+e+'</div><div><b>'+esc(t)+'</b>'+esc(s)+'</div>';
 
-  // week
-  const end=isCur||!isPast?(isCur?new Date(today):new Date(y,m,Math.min(7,n))):new Date(y,m,n);
-  const days=[];for(let i=6;i>=0;i--){const d=new Date(end);d.setDate(end.getDate()-i);days.push(d)}
-  const vals=days.map(d=>spentOn(ymd(d)));const mx=Math.max(perDay>0?perDay:0,...vals,1);
-  const lim=perDay>0?perDay:Infinity;
-  $("week").innerHTML=days.map((d,i)=>'<div class="wk'+(ymd(d)===ymd(today)?" today":"")+'"><div class="b '+(vals[i]>lim?"over":vals[i]>0?"ok":"")+'" data-h="'+Math.max(4,vals[i]/mx*92)+'"><em>'+(vals[i]?kfmt(vals[i]):"")+'</em></div><span>'+WD[d.getDay()]+'</span></div>').join("");
-  requestAnimationFrame(()=>requestAnimationFrame(()=>$$("#week .b").forEach(b=>b.style.height=b.dataset.h+"px")));
-  $("wkSum").textContent=money(sum(vals,v=>v));
-  $("wkLegend").textContent=perDay>0?"красным — дни, когда потратили больше лимита ("+money(perDay)+")":"траты по дням";
-
   // cats
   const by={};st.items.forEach(i=>by[i.cat]=(by[i.cat]||0)+(+i.amount||0));
   const arr=Object.entries(by).sort((a,b)=>b[1]-a[1]),mxc=arr.length?arr[0][1]:1;
@@ -793,17 +989,10 @@ function rFlow(st){
   $("flowNet").innerHTML=inc.length?'<span class="m">Итог месяца по факту</span><b class="'+(net>=0?"g":"r")+'">'+(net>=0?"+":"−")+money(Math.abs(net))+'</b>':'<span class="m" style="font-size:13px">Поступления добавляются из SMS банка: «+» → «📋 Из SMS»</span>';
   $("flowSub").textContent=MONTHS[+st.key.slice(5)-1].toLowerCase();
   grow($("flow"));
-  const cards=Object.entries(state.cards||{}).sort((a,b)=>b[1].at.localeCompare(a[1].at));
-  $("cardsCard").classList.toggle("hidden",!cards.length);
-  if(cards.length){
-    $("cardsTotal").textContent="всего "+money(sum(cards,c=>c[1].balance));
-    $("cardsList").innerHTML=cards.map(([id,c])=>{const d=c.at.slice(0,10),tm=c.at.slice(11,16);
-      const when=d===ymd(new Date())?"сегодня "+tm:human(d)+" "+tm;
-      return '<div class="cardrow"><div class="cc">'+esc(id.replace(/^(MIR|VISA|ECMC|MC|MAES)-?/,"").replace(/^СЧЁТ/,"сч ").replace(/^КАРТА\*?/,"*"))+'</div><div class="t"><div>'+esc(c.name||id)+'</div><div class="d">обновлено '+when+'</div></div><b class="amt">'+money(c.balance)+'</b></div>'}).join("")}
 }
 
-function itemRow(i,mk){const c=CAT[i.cat]||CAT.other;
-  return '<div class="sw" data-sid="'+i.id+'" data-m="'+mk+'"><div class="sw-bg" data-delsp>Удалить</div><div class="row'+nw(i.id)+'"'+sd()+'><div class="ic" style="background:'+c[3]+'22">'+c[1]+'</div><div class="t"><div class="n">'+esc(i.note||c[2])+'</div>'+
+function itemRow(i,mk){const c=CAT[i.cat]||CAT.other;const b=brandOf(i.note);
+  return '<div class="sw" data-sid="'+i.id+'" data-m="'+mk+'"><div class="sw-bg" data-delsp>Удалить</div><div class="row'+nw(i.id)+'"'+sd()+'>'+mono(i.note,i.cat)+'<div class="t"><div class="n">'+esc(b?b.name:(i.note||c[2]))+'</div>'+
     (i.note?'<div class="d">'+c[2]+'</div>':'')+'</div><div class="amt r">−'+money(i.amount)+'</div></div></div>'}
 
 function rSpend(st){
@@ -869,7 +1058,7 @@ function go(i,anim=true){vi=Math.max(0,Math.min(4,i));
   track.style.transform="translateX("+(-vi*20)+"%)";
   $("tabInd").style.transform="translateX("+(vi*100)+"%)";
   $$("#tabbar button").forEach((b,j)=>b.classList.toggle("on",j===vi));
-  $("fab").classList.toggle("hide",vi>=3);
+  $("fab").classList.toggle("hide",vi>=2);
   updHdr()}
 $$("#tabbar button").forEach(b=>b.onclick=()=>{if(+b.dataset.i===vi)views[vi].scrollTo({top:0,behavior:"smooth"});else go(+b.dataset.i)});
 function updHdr(){$("top").style.setProperty("--hdr",views[vi].scrollTop>20?1:0)}
@@ -877,7 +1066,7 @@ views.forEach(v=>v.addEventListener("scroll",updHdr,{passive:true}));
 
 // swipe between views
 (function(){let sx=0,sy=0,dx=0,on=false,lock=null,W=1,pid=null;
-  track.addEventListener("pointerdown",e=>{if(e.pointerType==="mouse"||e.target.closest(".sw,.hscroll,.cal"))return;
+  track.addEventListener("pointerdown",e=>{if(e.pointerType==="mouse"||e.target.closest(".sw,.hscroll,.cal,.cardrail,.chartwrap,.extra,input"))return;
     sx=e.clientX;sy=e.clientY;dx=0;on=true;lock=null;W=innerWidth;pid=e.pointerId});
   track.addEventListener("pointermove",e=>{if(!on||e.pointerId!==pid)return;const x=e.clientX-sx,y=e.clientY-sy;
     if(lock===null&&(Math.abs(x)>8||Math.abs(y)>8)){lock=Math.abs(x)>Math.abs(y)*1.2?"x":"y";if(lock==="x"){track.classList.add("drag");try{track.setPointerCapture(pid)}catch(_){}}}
@@ -908,6 +1097,9 @@ $("prevM").onclick=()=>shiftMonth(-1);$("nextM").onclick=()=>shiftMonth(1);
 function seg(id,attr,val){const s=$(id),bs=$$("button",s),i=bs.findIndex(b=>b.dataset[attr]===val);
   bs.forEach((b,j)=>b.classList.toggle("on",j===i));const ind=s.querySelector(".ind");
   ind.style.width="calc((100% - 6px)/"+bs.length+")";ind.style.transform="translateX("+(i*100)+"%)"}
+let spendMode="list";
+$("spendMode").onclick=e=>{const b=e.target.closest("[data-sm]");if(!b)return;spendMode=b.dataset.sm;seg("spendMode","sm",spendMode);
+  $("listBox").classList.toggle("hidden",spendMode!=="list");$("calBox").classList.toggle("hidden",spendMode!=="cal")};
 $("spendRange").onclick=e=>{const b=e.target.closest("button");if(!b)return;spendRange=b.dataset.r;seg("spendRange","r",spendRange);render()};
 
 // clicks
@@ -932,6 +1124,10 @@ document.addEventListener("click",e=>{
   if(dg){const id=dg.dataset.delg,i=state.goals.findIndex(g=>g.id===id),it=state.goals[i];
     state.goals.splice(i,1);saveGoals();render();toast("Цель удалена",()=>{state.goals.splice(i,0,it);seen.delete("g"+it.id);saveGoals();render()});return}
   const tp=e.target.closest("[data-top]");if(tp){openTop(tp.dataset.top);return}
+  const cdb=e.target.closest("[data-card]");if(cdb){openCard(cdb.dataset.card);return}
+  const ad=e.target.closest("[data-adddebt]");if(ad){openDebt(null,ad.dataset.adddebt);return}
+  const db=e.target.closest("[data-debt]");if(db){openDebt(db.dataset.debt);return}
+  const gt=e.target.closest("[data-goto]");if(gt){go(+gt.dataset.goto);return}
   const dd=e.target.closest("[data-day]");if(dd){selDay=dd.dataset.day;render();return}
   const da=e.target.closest("[data-add]");if(da){openPlan(da.dataset.add);return}
   if(e.target.closest("[data-close]")){closeSheet();return}
@@ -978,7 +1174,7 @@ $("spDays").onclick=e=>{const b=e.target.closest("[data-d]");if(!b)return;spDay=
 $("spDate").onchange=paintDays;
 $("fab").onclick=()=>{kp="";$("spNote").value="";$("smsBox").classList.add("hidden");
   const isCur=ym(cur)===ym(today);
-  if(vi===2&&selDay!==ymd(today)){spDay="pick";$("spDate").value=selDay}else if(isCur){spDay="today"}else{spDay="pick";$("spDate").value=ym(cur)+"-01"}
+  if(vi===1&&spendMode==="cal"&&selDay!==ymd(today)){spDay="pick";$("spDate").value=selDay}else if(isCur){spDay="today"}else{spDay="pick";$("spDate").value=ym(cur)+"-01"}
   paintCats();paintDays();paintKp();openSheet("shSpend")};
 $("spSave").onclick=()=>{const a=num(kp);
   if(!(a>0)){const el=$("kpV");el.classList.remove("shake");void el.offsetWidth;el.classList.add("shake");return}
@@ -1043,7 +1239,8 @@ const RULES=`Ты — дружелюбный финансовый советчи
 - Отвечай по-русски, просто и тепло, без жаргона. Если нужен термин — объясни его в одной фразе.
 - Отвечай коротко: 2–6 предложений или короткий список. Длиннее — только если просят план или подробности.
 - Опирайся на ДАННЫЕ пользователя ниже: называй конкретные суммы в рублях, категории, даты. Не выдумывай цифры, которых нет.
-- Если данных мало (нет плана, нет трат) — мягко подскажи, что заполнить в приложении (вкладки «План», «Траты», «Цели», кнопка «+»).
+- Если данных мало (нет плана, нет трат) — мягко подскажи, что заполнить в приложении (вкладки «План», «Операции», «Долги», кнопка «+»).
+- Про долги: учитывай ставки, льготные периоды кредиток (погасить до даты — без процентов), метод «лавина» (сначала самая высокая ставка) и «снежный ком». Советуй при досрочном погашении уменьшать срок.
 - Давай конкретные шаги, которые можно сделать в ближайшие дни.
 - Не советуй конкретные акции, криптовалюту, банки или кредитные продукты. Про инвестиции и кредиты — только общие принципы и напоминание, что ты не лицензированный консультант.
 - Не осуждай. Хвали за успехи.
@@ -1154,6 +1351,16 @@ cushion(s){
   else L.push("\n💡 Создайте во вкладке «Цели» цель «Подушка безопасности» и пополняйте её с каждой зарплаты. Храните подушку отдельно — например, на накопительном счёте, чтобы не тратить случайно.");
   return L.join("\n")},
 credit(s){
+  const dd=(state.debts||[]).filter(d=>d.balance>0);
+  if(dd.length){const ex=+($("exRange")&&$("exRange").value)||0;const base=simulate(0,"avalanche"),av=simulate(Math.max(ex,1000),"avalanche"),sn=simulate(Math.max(ex,1000),"snowball");
+    const top=[...dd].sort((a,b)=>(+b.rate||0)-(+a.rate||0))[0];const gr=dd.filter(graceSoon);const X=[];
+    X.push("Ваши долги: "+dd.map(d=>d.name+" — "+money(d.balance)+" под "+(d.rate||0)+"%").join(", ")+".");
+    if(gr.length)X.push("\n⏳ **Сначала:** "+gr.map(d=>d.name+" — погасите "+money(d.balance)+" до "+human(d.graceEnd)).join("; ")+". Так проценты не начислятся совсем.");
+    X.push("\n🏔 **Лавина** (выгоднее): всё лишнее — в «"+top.name+"» ("+top.rate+"%).");
+    if(base&&av&&!av.never)X.push("Если вносить сверх платежей "+money(Math.max(ex,1000))+" в месяц — все долги закроются к "+whenStr(av.end)+", переплата "+money(av.interest)+(base.never?"":", экономия "+money(Math.max(0,base.interest-av.interest)))+".");
+    if(sn&&av&&!sn.never)X.push("⛄ Снежный ком (сначала маленькие долги) даст переплату "+money(sn.interest)+" — на "+money(Math.max(0,sn.interest-av.interest))+" больше, зато первые долги закроются быстрее.");
+    X.push("\nПри досрочном погашении выбирайте уменьшение **срока**, а не платежа. Точный расчёт с ползунком — во вкладке «Долги».\n\nЭто общие принципы, а не персональная финансовая консультация.");
+    return X.join("\n")}
   const cr=state.plans.filter(p=>p.type==="expense"&&/кредит|ипотек|займ|рассроч|долг|карт/i.test(p.name)),L=[];
   if(cr.length){const t=sum(cr,p=>p.amount);L.push("Ваши платежи по долгам: "+cr.map(p=>p.name+" — "+money(p.amount)).join(", ")+". Всего **"+money(t)+"/мес.**"+(s.st.inc?" ("+pct(t,s.st.inc)+" дохода).":""));
     if(s.st.inc&&t/s.st.inc>.3)L.push("⚠️ Больше 30% дохода уходит на долги — это высокая нагрузка. Новые кредиты сейчас лучше не брать.");L.push("")}
@@ -1211,6 +1418,7 @@ function aiContext(){
   if(last.length)L.push("Последние траты (14 дней):"+last.map(i=>"\n- "+i.date+" "+(CAT[i.cat]||CAT.other)[2]+(i.note?" ("+i.note+")":"")+": "+money(i.amount)).join(""));
   const fi=((state.incomes||{})[ym(t)]||[]);if(fi.length)L.push("Фактические поступления за месяц: "+money(sum(fi,i=>i.amount))+" ("+fi.slice(-8).map(i=>(i.who||"поступление")+" "+money(i.amount)).join(", ")+").");
   const cs=Object.entries(state.cards||{});if(cs.length)L.push("Остатки на картах: "+cs.map(([k,c])=>k+" — "+money(c.balance)).join(", ")+".");
+  const dbs=(state.debts||[]).filter(d=>d.balance>0);if(dbs.length)L.push("Долги:"+dbs.map(d=>"\n- "+(d.type==="card"?"Кредитная карта ":"Кредит ")+d.name+": долг "+money(d.balance)+", ставка "+(d.rate||0)+"% годовых, платёж "+money(minOf(d))+"/мес"+(d.type==="card"&&d.limit?", лимит "+money(d.limit):"")+(d.graceEnd?", льготный период до "+d.graceEnd:"")).join(""));
   L.push("Цели-копилки:"+(state.goals.map(g=>"\n- "+g.name+": накоплено "+money(g.saved||0)+" из "+money(g.target)).join("")||" нет"));
   return L.join("\n");
 }
@@ -1291,13 +1499,13 @@ $("bkSave").onclick=async()=>{const data=JSON.stringify({app:"koshelek",v:1,save
 $("bkLoad").onclick=()=>$("bkFile").click();
 $("bkFile").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;
   try{const d=JSON.parse(await f.text());if(!d||!Array.isArray(d.plans))throw 0;
-    const prev=state;state={plans:d.plans,months:d.months||{},goals:d.goals||[],incomes:d.incomes||{},cards:d.cards||{}};seen.clear();saveLocal();closeSheet();render();
+    const prev=state;state={plans:d.plans,months:d.months||{},goals:d.goals||[],incomes:d.incomes||{},cards:d.cards||{},debts:d.debts||[]};seen.clear();saveLocal();closeSheet();render();
     toast("Данные восстановлены",()=>{state=prev;saveLocal();render()})}
   catch(_){toast("Это не файл копии Кошелька")}};
 let wipeArm=0;
 $("wipe").onclick=()=>{if(Date.now()-wipeArm>3000){wipeArm=Date.now();$("wipe").textContent="Точно удалить? Нажмите ещё раз";
     setTimeout(()=>{$("wipe").textContent="Удалить все данные"},3000);return}
-  const prev=state;state={plans:[],months:{},goals:[],incomes:{},cards:{}};seen.clear();saveLocal();$("wipe").textContent="Удалить все данные";closeSheet();render();
+  const prev=state;state={plans:[],months:{},goals:[],incomes:{},cards:{},debts:[]};seen.clear();saveLocal();$("wipe").textContent="Удалить все данные";closeSheet();render();
   toast("Все данные удалены",()=>{state=prev;saveLocal();render()})};
 if("serviceWorker" in navigator&&/^https?:$/.test(location.protocol))addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 
@@ -1351,8 +1559,9 @@ function parseOne(raw){
   if(type==="spend"&&(!who||who.length<2)){who=before.replace(/^.*?(покупк\S*|оплат\S*|списан\S*)(?: по сбп)?\s*(?:в|в магазине)?\s*/i,"").replace(/\d{1,2}:\d{2}|\d{2}\.\d{2}(\.\d{2,4})?|(?:MIR|VISA|ECMC|MC)-?\d{4}|\*\d{4}|сч[её]т\S*|карт\S*/gi,"").trim()}
   who=who.replace(/^(?:[A-Z]\d{2,5}|\d{3,})\s+/,"").replace(/\s+\d{3,}$/,"").replace(/^ATM\s*\d*\s*/i,"").trim().slice(0,40);
   const pretty=(/[a-zа-яё]/.test(who)?who:titleCase(who)).replace(/^(Ип|Ооо|Зао|Пао|Оао)(?=\s)/,x=>x.toUpperCase()).replace(/\.$/,"");
-  const cat=type==="spend"?guessCat(who+" "+t):type==="transfer"?"transfer":"income";
-  return {raw:t,type,amount:Math.round(amount*100)/100,who:pretty,cat,card,time,date,smsDate:date,balance,cash:/внесение наличных/i.test(pretty)}}
+  const br=type==="spend"?brandOf(who+" "+t):null;
+  const cat=type==="spend"?(br?br.cat:guessCat(who+" "+t)):type==="transfer"?"transfer":"income";
+  return {raw:t,type,amount:Math.round(amount*100)/100,who:br?br.name:pretty,cat,card,time,date,smsDate:date,balance,cash:/внесение наличных/i.test(pretty)}}
 window.__parseSms=parseOne;
 
 function opKey(o){return [o.card,o.smsDate||"",o.time,o.type,o.amount].join("|")}
@@ -1459,6 +1668,247 @@ $("impPaste").onclick=pasteSms;
 $("smsDemo").onclick=()=>{closeSheet();setTimeout(()=>openImport("Счёт карты MIR-4816 17:07 зачисление 20 000р ATM 60200320 Баланс: 20 239.27р\nСЧЁТ4636 17:13 Перевод по СБП из Т-Банк +6200р от ЯРОСЛАВ Я. Баланс: 6439.27р\nСЧЁТ4636 17:14 перевод 6349.90р Баланс: 89.37р\nСчёт карты MIR-2157 17:14 зачисление 6349.90р Баланс: 3602.46р\nСчёт карты MIR-4816 19:17 Покупка по СБП 66.99р J611 Пятерочка Баланс: 22.38р"),300)};
 
 
+// ================= МАГАЗИНЫ РОССИИ И ЕВРОПЫ =================
+// [регулярка, как показывать, категория]. Логотипы не используем — только название и цветную монограмму.
+const BRANDS=[
+ [/пят[её]роч|pyaterochk|5ka/i,"Пятёрочка","food"],[/магнит|magnit/i,"Магнит","food"],[/перекр[её]ст|perekrest/i,"Перекрёсток","food"],[/чижик|chizhik/i,"Чижик","food"],
+ [/вкусвилл|vkusvill/i,"ВкусВилл","food"],[/лента|lenta/i,"Лента","food"],[/ашан|auchan/i,"Ашан","food"],[/дикси|dixy/i,"Дикси","food"],[/светофор|svetofor/i,"Светофор","food"],
+ [/монетк|monetk/i,"Монетка","food"],[/красное.?белое|krasnoe/i,"Красное&Белое","food"],[/бристоль|bristol/i,"Бристоль","food"],[/fix ?price|фикс ?прайс/i,"Fix Price","other"],
+ [/самокат|samokat/i,"Самокат","food"],[/яндекс ?лавка|yandex ?lavka/i,"Яндекс Лавка","food"],[/метро кэш|metro c&c|metro cash/i,"METRO","food"],[/окей|o'?key/i,"О'кей","food"],
+ [/глобус|globus/i,"Глобус","food"],[/верный|verny/i,"Верный","food"],[/мария-ра|maria-ra/i,"Мария-Ра","food"],[/ярче|yarche/i,"Ярче!","food"],[/spar|спар/i,"SPAR","food"],
+ [/азбука вкуса|azbuka/i,"Азбука вкуса","food"],[/командор/i,"Командор","food"],[/холди/i,"Холди","food"],[/победа/i,"Победа","food"],
+ [/lidl|лидл/i,"Lidl","food"],[/aldi|альди/i,"Aldi","food"],[/rewe/i,"REWE","food"],[/edeka/i,"EDEKA","food"],[/kaufland/i,"Kaufland","food"],[/penny/i,"Penny","food"],
+ [/netto/i,"Netto","food"],[/carrefour/i,"Carrefour","food"],[/tesco/i,"Tesco","food"],[/sainsbury/i,"Sainsbury's","food"],[/biedronka/i,"Biedronka","food"],
+ [/mercadona/i,"Mercadona","food"],[/albert heijn|\bah to go/i,"Albert Heijn","food"],[/jumbo/i,"Jumbo","food"],[/billa/i,"Billa","food"],[/hofer/i,"Hofer","food"],
+ [/migros/i,"Migros","food"],[/coop\b/i,"Coop","food"],[/intermarch/i,"Intermarché","food"],[/leclerc/i,"E.Leclerc","food"],[/dm-?drogerie|\bdm\b/i,"dm","health"],
+ [/rossmann|россманн/i,"Rossmann","health"],[/żabka|zabka/i,"Żabka","food"],[/maxima/i,"Maxima","food"],[/rimi\b/i,"Rimi","food"],[/a101|bim\b|şok\b/i,"Маркет","food"],
+ [/вкусно и точка|vkusno/i,"Вкусно — и точка","cafe"],[/rostic|ростикс|kfc/i,"Rostic's","cafe"],[/бургер кинг|burger king/i,"Бургер Кинг","cafe"],[/mcdonald|макдоналдс/i,"McDonald's","cafe"],
+ [/додо|dodo/i,"Додо Пицца","cafe"],[/шоколадниц/i,"Шоколадница","cafe"],[/теремок|teremok/i,"Теремок","cafe"],[/cofix|кофикс/i,"Cofix","cafe"],[/starbucks|старбакс/i,"Starbucks","cafe"],
+ [/stars coffee/i,"Stars Coffee","cafe"],[/surf coffee/i,"Surf Coffee","cafe"],[/яндекс ?еда|yandex ?eda/i,"Яндекс Еда","cafe"],[/delivery club|маркет деливери/i,"Доставка еды","cafe"],
+ [/subway|сабвей/i,"Subway","cafe"],[/costa coffee/i,"Costa Coffee","cafe"],[/pret a manger/i,"Pret","cafe"],
+ [/яндекс ?go|yandex\.?go|яндекс такси|yandex ?taxi/i,"Яндекс Go","transport"],[/uber/i,"Uber","transport"],[/bolt/i,"Bolt","transport"],[/ситимобил/i,"Ситимобил","transport"],
+ [/метрополит|metro moscow|mosmetro|тройка|troika/i,"Метро","transport"],[/ржд|rzd/i,"РЖД","transport"],[/аэрофлот|aeroflot/i,"Аэрофлот","transport"],[/победа авиа|pobeda/i,"Победа (авиа)","transport"],
+ [/лукойл|lukoil/i,"Лукойл","transport"],[/газпромнефть|gazpromneft/i,"Газпромнефть","transport"],[/роснефть|rosneft/i,"Роснефть","transport"],[/татнефть|tatneft/i,"Татнефть","transport"],
+ [/shell/i,"Shell","transport"],[/делимобиль|delimobil/i,"Делимобиль","transport"],[/whoosh/i,"Whoosh","transport"],[/юрент|urent/i,"Юрент","transport"],[/db bahn|deutsche bahn/i,"DB Bahn","transport"],
+ [/ryanair/i,"Ryanair","transport"],[/wizz/i,"Wizz Air","transport"],[/flixbus/i,"FlixBus","transport"],
+ [/ригла|rigla/i,"Ригла","health"],[/36[,.]6/i,"36,6","health"],[/горздрав/i,"Горздрав","health"],[/аптека|apteka/i,"Аптека","health"],[/инвитро|invitro/i,"Инвитро","health"],
+ [/wildberries|вайлдберриз|\bwb\b/i,"Wildberries","clothes"],[/ozon|озон/i,"Ozon","other"],[/яндекс ?маркет|yandex ?market/i,"Яндекс Маркет","other"],[/aliexpress|алиэкспресс/i,"AliExpress","other"],
+ [/lamoda|ламода/i,"Lamoda","clothes"],[/zara/i,"Zara","clothes"],[/h&m|h and m/i,"H&M","clothes"],[/gloria jeans|глория/i,"Gloria Jeans","clothes"],[/спортмастер|sportmaster/i,"Спортмастер","clothes"],
+ [/ostin|остин/i,"O'stin","clothes"],[/befree/i,"Befree","clothes"],[/uniqlo/i,"Uniqlo","clothes"],[/primark/i,"Primark","clothes"],[/decathlon/i,"Decathlon","clothes"],
+ [/мтс|\bmts\b/i,"МТС","home"],[/билайн|beeline/i,"Билайн","home"],[/мегафон|megafon/i,"МегаФон","home"],[/tele2|теле2|т2 /i,"Т2","home"],[/ростелеком|rostelecom/i,"Ростелеком","home"],
+ [/леруа|leroy/i,"Леруа Мерлен","home"],[/лемана/i,"Лемана ПРО","home"],[/икеа|ikea/i,"IKEA","home"],[/hoff|хофф/i,"Hoff","home"],[/obi\b|оби\b/i,"OBI","home"],[/жкх|жку|коммунал/i,"ЖКХ","home"],
+ [/м\.?видео|mvideo/i,"М.Видео","other"],[/эльдорадо|eldorado/i,"Эльдорадо","other"],[/dns|днс/i,"DNS","other"],[/media ?markt/i,"MediaMarkt","other"],
+ [/кинопоиск|kinopoisk/i,"Кинопоиск","fun"],[/яндекс ?плюс|yandex ?plus/i,"Яндекс Плюс","fun"],[/okko/i,"Okko","fun"],[/\bivi\b/i,"Иви","fun"],[/spotify/i,"Spotify","fun"],[/netflix/i,"Netflix","fun"],
+ [/steam/i,"Steam","fun"],[/playstation/i,"PlayStation","fun"],[/синема|cinema|кино/i,"Кино","fun"],
+ [/детский мир/i,"Детский мир","gifts"],[/цветы|flowwow/i,"Цветы","gifts"],[/золотое яблоко|goldapple/i,"Золотое Яблоко","clothes"],[/летуаль|l'etoile/i,"Л'Этуаль","clothes"],
+];
+function brandOf(t){t=String(t||"");for(const [re,name,cat] of BRANDS)if(re.test(t))return {name,cat};return null}
+function initials(n){const w=String(n||"?").replace(/[^\wА-Яа-яЁё&' ]/g," ").trim().split(/\s+/).filter(Boolean);
+  if(!w.length)return "?";return (w.length===1?w[0].slice(0,2):w[0][0]+w[1][0])}
+function mono(name,cat){const c=CAT[cat]||CAT.other;const b=brandOf(name);
+  if(!b&&(!name||name===c[2]))return '<div class="ic" style="background:'+c[3]+'22">'+c[1]+'</div>';
+  return '<div class="mono" style="background:'+c[3]+'">'+esc(initials(b?b.name:name))+'</div>'}
+
+// ================= КАРТЫ: карусель =================
+const CARD_COLORS=["orange","navy","green","yellow","violet","red"];
+function cardShort(id){return id.replace(/^(MIR|VISA|ECMC|MC|MAES)-?/,"").replace(/^СЧЁТ/,"").replace(/^КАРТА\*?/,"").replace(/^MAN-/,"")}
+function rCards(){
+  const cards=Object.entries(state.cards||{}).sort((a,b)=>(b[1].at||"").localeCompare(a[1].at||""));
+  $("cardsTotal").textContent=cards.length?"всего "+money(sum(cards,c=>c[1].balance)):"";
+  $("cardsList").innerHTML=cards.map(([id,c],i)=>{const col=c.color||CARD_COLORS[i%CARD_COLORS.length];
+    const d=(c.at||"").slice(0,10),tm=(c.at||"").slice(11,16);const when=!c.at?"":d===ymd(new Date())?"сегодня "+tm:human(d)+" "+tm;
+    const tag=/^MIR/.test(id)?"МИР":/^VISA/.test(id)?"VISA":/^(MC|ECMC)/.test(id)?"MC":/^СЧЁТ/.test(id)?"СЧЁТ":"";
+    return '<button class="bcard c-'+col+'" data-card="'+esc(id)+'">'+(tag?'<span class="tag">'+tag+'</span>':'')+'<div class="no">•••• '+esc(cardShort(id))+'</div><div class="nm">'+esc(c.name||"Карта")+'</div><div class="bl">'+money(c.balance)+'</div>'+(when?'<div class="ft">обновлено '+when+'</div>':'')+'</button>'}).join("")+
+    '<button class="bcard add" data-card="" aria-label="Добавить карту">+</button>'}
+let cdId=null,cdColor="orange";
+function openCard(id){cdId=id||null;const c=id?state.cards[id]:null;
+  $("cdTitle").textContent=c?"Карта •••• "+cardShort(id):"Новая карта";$("cdName").value=c?(c.name||""):"";$("cdNum").value=c?cardShort(id).slice(-4):"";
+  $("cdNum").disabled=!!c;$("cdBal").value=c?String(c.balance).replace(".",","):"";cdColor=(c&&c.color)||"orange";paintCd();$("cdDel").classList.toggle("hidden",!c);openSheet("shCard")}
+function paintCd(){$("cdColors").innerHTML=CARD_COLORS.map(k=>'<button class="chip'+(k===cdColor?" on":"")+'" data-cc="'+k+'"><span class="bcard c-'+k+'" style="width:18px;height:18px;border-radius:5px;display:inline-block;vertical-align:-4px;padding:0;box-shadow:none"></span></button>').join("")}
+$("cdColors").onclick=e=>{const b=e.target.closest("[data-cc]");if(b){cdColor=b.dataset.cc;paintCd()}};
+$("cdSave").onclick=()=>{const bal=num($("cdBal").value);if(!(bal>=0)){toast("Введите остаток");return}
+  let id=cdId;if(!id){const n=$("cdNum").value.replace(/\D/g,"").slice(-4);if(n.length!==4){toast("Нужны 4 цифры");return}id="MAN-"+n;if(state.cards[id]){toast("Такая карта уже есть");return}}
+  const c=state.cards[id]||{};state.cards[id]={...c,name:$("cdName").value.trim().slice(0,30),balance:Math.round(bal*100)/100,at:c.at||(ymd(new Date())+"T"+pad(new Date().getHours())+":"+pad(new Date().getMinutes())),color:cdColor};
+  if(c.balance!==undefined&&c.balance!==bal)state.cards[id].at=ymd(new Date())+"T"+pad(new Date().getHours())+":"+pad(new Date().getMinutes());
+  saveLocal();closeSheet();render();toast("Сохранено ✓")};
+$("cdDel").onclick=()=>{const it=state.cards[cdId],id=cdId;delete state.cards[id];saveLocal();closeSheet();render();toast("Карта удалена",()=>{state.cards[id]=it;saveLocal();render()})};
+
+// ================= ГРАФИК ТРАТ =================
+let chartRange="week";
+function chartData(){const t=new Date(),pts=[];
+  if(chartRange==="week"){for(let i=6;i>=0;i--){const d=new Date(t);d.setDate(t.getDate()-i);pts.push({l:WD[d.getDay()],v:spentOn(ymd(d)),on:i===0})}}
+  else if(chartRange==="month"){const y=cur.getFullYear(),m=cur.getMonth(),n=dim(y,m);const lastDay=ym(cur)===ym(t)?t.getDate():n;
+    for(let d=1;d<=lastDay;d++)pts.push({l:(d===1||d%5===0||d===lastDay)?String(d):"",v:spentOn(ym(cur)+"-"+pad(d)),on:d===lastDay})}
+  else{for(let i=11;i>=0;i--){const d=new Date(t.getFullYear(),t.getMonth()-i,1);const it=state.months[ym(d)]||[];
+    pts.push({l:["Янв","Фев","Мар","Апр","Май","Июн","Июл","Авг","Сен","Окт","Ноя","Дек"][d.getMonth()],v:sum(it.filter(x=>x.cat!=="save"),x=>x.amount),on:i===0})}}
+  return pts}
+function rChart(){const el=$("chart");const pts=chartData();const W=Math.max(280,el.clientWidth||340),H=190,P=18,B=26;
+  const mx=Math.max(1,...pts.map(p=>p.v));const n=pts.length;
+  const X=i=>P+(n===1?0:(W-2*P)*i/(n-1)),Y=v=>P+8+(H-B-P-8)*(1-v/mx);
+  const xy=pts.map((p,i)=>[X(i),Y(p.v)]);
+  let d="M"+xy[0][0]+","+xy[0][1];for(let i=1;i<xy.length;i++){const [x0,y0]=xy[i-1],[x1,y1]=xy[i],cx=(x0+x1)/2;d+=" C"+cx+","+y0+" "+cx+","+y1+" "+x1+","+y1}
+  const area=d+" L"+xy[n-1][0]+","+(H-B)+" L"+xy[0][0]+","+(H-B)+" Z";
+  let hi=pts.findIndex(p=>p.on);if(hi<0)hi=n-1;const maxI=pts.reduce((a,p,i)=>p.v>pts[a].v?i:a,0);const sel=pts[hi].v>0?hi:maxI;
+  el.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none"><defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD21F" stop-opacity=".45"/><stop offset="1" stop-color="#FFD21F" stop-opacity="0"/></linearGradient></defs>'+
+    '<path d="'+area+'" fill="url(#ga)"/><path class="ln" d="'+d+'" fill="none" stroke="#FFC400" stroke-width="3" stroke-linecap="round"/>'+
+    '<line x1="'+xy[sel][0]+'" x2="'+xy[sel][0]+'" y1="'+xy[sel][1]+'" y2="'+(H-B)+'" stroke="var(--navy)" stroke-opacity=".35" stroke-width="1.5"/>'+
+    '<circle cx="'+xy[sel][0]+'" cy="'+xy[sel][1]+'" r="6" fill="#FFC400" stroke="var(--card)" stroke-width="3"/>'+
+    pts.map((p,i)=>p.l?'<text class="xl'+(i===sel?" on":"")+'" x="'+X(i)+'" y="'+(H-6)+'" text-anchor="middle">'+p.l+'</text>':"").join("")+'</svg>'+
+    '<div class="bub" style="left:'+(xy[sel][0]/W*100)+'%;top:'+xy[sel][1]+'px">'+money(pts[sel].v)+'</div>';
+  if(!reduce){const ln=el.querySelector(".ln");const L=ln.getTotalLength();ln.style.strokeDasharray=L;ln.style.strokeDashoffset=L;ln.getBoundingClientRect();ln.style.transition="stroke-dashoffset 1s cubic-bezier(.22,.8,.24,1)";ln.style.strokeDashoffset=0}}
+$("chartRange").onclick=e=>{const b=e.target.closest("[data-r]");if(!b)return;chartRange=b.dataset.r;seg("chartRange","r",chartRange);rChart()};
+
+// ================= ПОСЛЕДНИЕ ОПЕРАЦИИ =================
+function rRecent(){const all=[];Object.keys(state.months).forEach(k=>state.months[k].forEach(i=>all.push({...i,_k:"s"})));
+  Object.keys(state.incomes||{}).forEach(k=>state.incomes[k].forEach(i=>all.push({...i,_k:"i"})));
+  all.sort((a,b)=>(b.date+(b.time||"")).localeCompare(a.date+(a.time||""))||(b.t||0)-(a.t||0));
+  $("recentList").innerHTML=all.length?all.slice(0,5).map(i=>{const inc=i._k==="i";const cat=inc?"income":i.cat;const name=inc?(i.who||"Поступление"):(i.note||(CAT[i.cat]||CAT.other)[2]);
+    const b=brandOf(name);const shown=b?b.name:name;
+    return '<div class="row">'+(inc?'<div class="mono" style="background:#14A06B">'+esc(initials(shown))+'</div>':mono(name,cat))+'<div class="t"><div class="n">'+esc(shown)+'</div><div class="d">'+human(i.date)+(i.time?", "+i.time:"")+'</div></div><div class="amt '+(inc?"g":"")+'">'+(inc?"+":"−")+money(i.amount)+'</div></div>'}).join("")
+    :'<div class="empty"><span class="e">🧾</span>Операций пока нет. Нажмите «+» или «📋 Из SMS».</div>'}
+
+// ================= ДОЛГИ =================
+const r12=r=>(+r||0)/1200;
+function debtsList(){return (state.debts||[]).filter(d=>d.balance>0)}
+function monthsLeft(d,pay){const r=r12(d.rate);if(pay<=0)return Infinity;if(r===0)return Math.ceil(d.balance/pay);const x=1-r*d.balance/pay;if(x<=0)return Infinity;return Math.ceil(-Math.log(x)/Math.log(1+r))}
+function minOf(d){return d.minPay>0?d.minPay:(d.type==="card"?Math.max(300,d.balance*.05):Math.max(500,d.balance*.03))}
+function simulate(extra,strategy){
+  const ds=debtsList().map(d=>({...d,b:d.balance,closed:null,paid:0}));if(!ds.length)return null;
+  const now=new Date();let month=0,interest=0;
+  while(ds.some(d=>d.b>0.5)&&month<600){month++;
+    let pool=extra;
+    ds.forEach(d=>{if(d.b<=0.5)return;
+      const inGrace=d.type==="card"&&d.graceEnd&&new Date(now.getFullYear(),now.getMonth()+month-1,now.getDate())<=parse(d.graceEnd);
+      const i=inGrace?0:d.b*r12(d.rate);interest+=i;d.b+=i;const p=Math.min(minOf(d),d.b);d.b-=p;d.paid+=p});
+    ds.filter(d=>d.b<=0.5&&!d.closed).forEach(d=>{d.closed=month;d.b=0});
+    pool+=sum(ds.filter(d=>d.closed&&d.closed<month),d=>minOf(d)); // освободившиеся платежи идут дальше
+    const order=ds.filter(d=>d.b>0.5).sort(strategy==="snowball"?(a,b)=>a.b-b.b:(a,b)=>(+b.rate||0)-(+a.rate||0)||a.b-b.b);
+    // кредитка в льготном периоде с близким концом — в приоритете
+    order.sort((a,b)=>(graceSoon(b)?1:0)-(graceSoon(a)?1:0));
+    for(const d of order){if(pool<=0)break;const p=Math.min(pool,d.b);d.b-=p;pool-=p;d.paid+=p;if(d.b<=0.5&&!d.closed){d.closed=month;d.b=0}}
+  }
+  const end=new Date(now.getFullYear(),now.getMonth()+month,1);
+  return {months:month,interest,end,never:month>=600,order:ds.filter(d=>d.closed).sort((a,b)=>a.closed-b.closed).map(d=>({name:d.name,month:d.closed,rate:d.rate}))}}
+function graceSoon(d){if(d.type!=="card"||!d.graceEnd)return false;const days=(parse(d.graceEnd)-parse(ymd(new Date())))/864e5;return days>=0&&days<=60}
+const MON_G=["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
+const MON_N=["январь","февраль","март","апрель","май","июнь","июль","август","сентябрь","октябрь","ноябрь","декабрь"];
+const whenStr=d=>MON_N[d.getMonth()]+" "+d.getFullYear();
+const durStr=m=>{const y=Math.floor(m/12),mm=m%12;return (y?y+" "+plural(y,"год","года","лет"):"")+(y&&mm?" ":"")+(mm?mm+" мес.":"")||"меньше месяца"};
+let strategy="avalanche";
+function rDebts(){
+  const L=debtsList(),all=state.debts||[];
+  const total=sum(L,d=>d.balance),mins=sum(L,d=>minOf(d)),intM=sum(L,d=>d.balance*r12(d.rate));
+  const base=simulate(0,"avalanche");
+  $("debtSum").innerHTML=L.length?'<div class="k">Общий долг</div><div class="v">'+money(total)+'</div><div class="row3"><div>Платежи в месяц<b>'+money(mins)+'</b></div><div>Проценты в месяц<b>'+money(intM)+'</b></div><div>Без досрочных<b>'+(base?base.never?"не погасить":durStr(base.months):"—")+'</b></div></div>'
+    :'<div class="k">Долгов нет</div><div class="v">0 ₽</div><div style="font-size:13.5px;opacity:.85">Добавьте кредиты и кредитные карты — приложение посчитает, как закрыть их быстрее и с меньшей переплатой.</div>';
+  // предупреждения о льготном периоде
+  const al=[];all.filter(d=>d.type==="card"&&d.balance>0&&d.graceEnd).forEach(d=>{const days=Math.round((parse(d.graceEnd)-parse(ymd(new Date())))/864e5);
+    if(days<0)al.push('<div class="alert hot"><div class="e">⚠️</div><div><b>'+esc(d.name)+': льготный период закончился</b>Теперь на '+money(d.balance)+' начисляются проценты ('+d.rate+'% годовых ≈ '+money(d.balance*r12(d.rate))+' в месяц). Гасите эту карту в первую очередь.</div></div>');
+    else if(days<=60)al.push('<div class="alert'+(days<=10?" hot":"")+'"><div class="e">⏳</div><div><b>'+esc(d.name)+': '+money(d.balance)+' до '+human(d.graceEnd)+'</b>Осталось '+days+' '+plural(days,"день","дня","дней")+'. Погасите всю сумму до этой даты — и проценты не начислятся. Это примерно '+money(d.balance/Math.max(1,Math.ceil(days/30)))+' в месяц.</div></div>')});
+  $("graceAlerts").innerHTML=al.join("");
+  // кредитки
+  const cc=all.filter(d=>d.type==="card");
+  $("ccRail").innerHTML=cc.map((d,i)=>{const used=d.limit>0?Math.min(1,d.balance/d.limit):0;const days=d.graceEnd?Math.round((parse(d.graceEnd)-parse(ymd(new Date())))/864e5):null;
+    return '<button class="bcard debt c-'+["navy","orange","violet","green"][i%4]+'" data-debt="'+d.id+'"><span class="tag">'+(d.rate||0)+'%</span><div class="no">Кредитная карта</div><div class="nm">'+esc(d.name)+'</div><div class="bl">−'+money(d.balance)+'</div>'+
+      (d.limit>0?'<div class="prog"><i style="width:'+(used*100)+'%"></i></div>':'')+'<div class="ft">'+(days!=null?(days>=0?"без % до "+human(d.graceEnd):"льготный период истёк"):(d.limit>0?"лимит "+money(d.limit):""))+'</div></button>'}).join("")+
+    '<button class="bcard add" data-adddebt="card" aria-label="Добавить кредитную карту">+</button>';
+  const loans=all.filter(d=>d.type!=="card");
+  $("loanList").innerHTML=loans.length?loans.map(d=>{const m=monthsLeft(d,minOf(d));
+    return '<button class="row" data-debt="'+d.id+'" style="width:100%;text-align:left"><div class="mono" style="background:#3B5B8C">'+esc(initials(d.name))+'</div><div class="t"><div class="n">'+esc(d.name)+'</div><div class="d">'+(d.rate||0)+'% · '+money(minOf(d))+'/мес'+(isFinite(m)?" · ещё "+durStr(m):" · платёж не покрывает проценты")+'</div></div><div class="amt">'+money(d.balance)+'</div></button>'}).join("")
+    :'<div class="empty">Добавьте ипотеку, автокредит, потребительский кредит или рассрочку</div>';
+  // стратегия
+  const ex=+$("exRange").value;$("exVal").textContent=money(ex);
+  $("stratCard").classList.toggle("hidden",!L.length);
+  $("stratHint").textContent=strategy==="avalanche"?"Лавина: всё лишнее — в долг с самой высокой ставкой. Меньше всего переплата.":"Снежный ком: всё лишнее — в самый маленький долг. Долги закрываются быстрее по одному — это мотивирует.";
+  if(L.length){const s=simulate(ex,strategy);
+    const saved=base&&s?Math.max(0,base.interest-s.interest):0,faster=base&&s?Math.max(0,base.months-s.months):0;
+    $("stratRes").innerHTML=(s.never?'<div class="alert hot"><div class="e">⚠️</div><div><b>Платежей не хватает</b>Проценты больше, чем вы платите. Увеличьте платежи или обратитесь в банк за реструктуризацией.</div></div>':
+      '<div class="resgrid"><div>Все долги закрыты<b>'+whenStr(s.end)+'</b></div><div>Срок<b>'+durStr(s.months)+'</b></div><div>Переплата процентов<b>'+money(s.interest)+'</b></div><div class="'+(saved>0?"good":"")+'">Экономия<b>'+(saved>0?money(saved)+(faster?" и "+faster+" мес.":""):"—")+'</b></div></div>'+
+      '<div class="m" style="font-size:13px;margin:0 2px 6px">Порядок закрытия:</div><div class="list order">'+s.order.map(o=>'<div class="row"><div class="t"><div class="n">'+esc(o.name)+'</div><div class="d">'+(o.rate||0)+'% годовых</div></div><div class="d m">'+whenStr(new Date(new Date().getFullYear(),new Date().getMonth()+o.month,1))+'</div></div>').join("")+'</div>')}
+}
+$("exRange").oninput=()=>{rDebts()};
+$("stratSeg").onclick=e=>{const b=e.target.closest("[data-st]");if(!b)return;strategy=b.dataset.st;seg("stratSeg","st",strategy);rDebts()};
+$("askDebt").onclick=()=>aiAsk("Как мне выгоднее и быстрее закрыть мои кредиты и кредитные карты? Я готов(а) платить сверх обязательных платежей "+money(+$("exRange").value)+" в месяц.");
+// шторка долга
+let dbId=null,dbType="loan";
+function paintDb(){seg("dbType","t",dbType);const c=dbType==="card";$("dbCardF").classList.toggle("hidden",!c);
+  $("dbTitle").textContent=(dbId?"":"Новый ")+(c?"кредитная карта":"кредит");if(!dbId)$("dbTitle").textContent=c?"Новая кредитная карта":"Новый кредит";
+  $("dbBalL").textContent=c?"Долг по карте, ₽":"Остаток долга, ₽";$("dbMinL").textContent=c?"Мин. платёж, ₽":"Платёж в месяц, ₽";$("dbName").placeholder=c?"Кредитка Альфа":"Кредит на машину"}
+function openDebt(id,type){dbId=id||null;const d=id?(state.debts||[]).find(x=>x.id===id):null;dbType=d?d.type:(type||"loan");
+  $("dbName").value=d?d.name:"";$("dbBal").value=d?String(d.balance).replace(".",","):"";$("dbRate").value=d&&d.rate?String(d.rate).replace(".",","):"";
+  $("dbMin").value=d&&d.minPay?String(d.minPay).replace(".",","):"";$("dbDay").value=d&&d.payDay?d.payDay:"";$("dbLimit").value=d&&d.limit?String(d.limit):"";
+  $("dbGrace").value=d&&d.graceDays?d.graceDays:"";$("dbGraceEnd").value=d&&d.graceEnd?d.graceEnd:"";$("dbDel").classList.toggle("hidden",!d);
+  openSheet("shDebt");requestAnimationFrame(paintDb)}
+$("dbType").onclick=e=>{const b=e.target.closest("[data-t]");if(b){dbType=b.dataset.t;paintDb()}};
+$("dbGrace").oninput=()=>{const g=parseInt($("dbGrace").value,10);if(g>0&&!$("dbGraceEnd").value){const d=new Date();d.setDate(d.getDate()+g);$("dbGraceEnd").value=ymd(d)}};
+$("dbSave").onclick=()=>{const bal=num($("dbBal").value),rate=num($("dbRate").value);
+  if(!(bal>=0)){$("dbBal").focus();toast("Введите сумму долга");return}if(!(rate>=0)){$("dbRate").focus();toast("Введите ставку");return}
+  const d={id:dbId||uid(),type:dbType,name:($("dbName").value.trim()||(dbType==="card"?"Кредитная карта":"Кредит")).slice(0,40),balance:Math.round(bal*100)/100,rate:Math.round(rate*100)/100,
+    minPay:num($("dbMin").value)>0?num($("dbMin").value):0,payDay:parseInt($("dbDay").value,10)||0};
+  if(dbType==="card"){d.limit=num($("dbLimit").value)>0?num($("dbLimit").value):0;d.graceDays=parseInt($("dbGrace").value,10)||0;d.graceEnd=$("dbGraceEnd").value||""}
+  state.debts=state.debts||[];const i=state.debts.findIndex(x=>x.id===d.id);if(i>=0)state.debts[i]=d;else state.debts.push(d);
+  saveLocal();closeSheet();render();toast("Сохранено ✓")};
+$("dbDel").onclick=()=>{const i=state.debts.findIndex(x=>x.id===dbId),it=state.debts[i];state.debts.splice(i,1);saveLocal();closeSheet();render();toast("Удалено",()=>{state.debts.splice(i,0,it);saveLocal();render()})};
+
+// ================= СОВЕТЫ =================
+function cushionGoal(){return state.goals.find(g=>/подушк|резерв|заначк|ч[её]рн/i.test(g.name))}
+function avgSpend(){const t=new Date();const arr=[1,2,3].map(k=>state.months[ym(new Date(t.getFullYear(),t.getMonth()-k,1))]||[]).filter(a=>a.length).map(a=>sum(a.filter(i=>i.cat!=="save"),i=>i.amount));
+  if(arr.length)return sum(arr,x=>x)/arr.length;const st=stats(t.getFullYear(),t.getMonth());const it=st.items.filter(i=>i.cat!=="save");return t.getDate()>3?sum(it,i=>i.amount)/t.getDate()*dim(t.getFullYear(),t.getMonth()):0}
+function tipsModel(){const t=new Date(),st=stats(t.getFullYear(),t.getMonth());
+  const debtInPlan=state.plans.some(p=>p.type==="expense"&&/кредит|ипотек|займ|рассроч|карт/i.test(p.name));
+  const mins=debtInPlan?0:sum(debtsList(),d=>minOf(d));
+  const spend=avgSpend();const free=st.inc-st.fix-mins-spend;
+  const needs=st.fix+(debtInPlan?0:sum(debtsList(),d=>minOf(d)))+spend;
+  const cg=cushionGoal();const cushion=cg?(cg.saved||0):0;
+  const hot=debtsList().filter(d=>(+d.rate||0)>=15),cheap=debtsList().filter(d=>(+d.rate||0)<15);
+  const grace=debtsList().filter(graceSoon);
+  let parts=[],graceShort=0;// [label, share, color, sub]
+  if(free>0){
+    let rest=free;const gNeed=sum(grace,d=>d.balance/Math.max(1,Math.ceil(Math.max(1,(parse(d.graceEnd)-parse(ymd(t)))/864e5)/30)));
+    if(grace.length){const g=Math.min(rest,gNeed);parts.push(["Кредитки в льготный период",g,"#E5484D","чтобы не платить проценты"]);rest-=g;graceShort=Math.max(0,gNeed-g)}
+    if(rest>0){let c=0,d=0,s=0;
+      if(cushion<needs){c=hot.length?.4:cheap.length?.7:.9;d=hot.length?.6:cheap.length?.3:0;s=1-c-d}
+      else if(hot.length){c=.2;d=.8}
+      else if(cushion<needs*3){c=cheap.length?.6:.8;d=cheap.length?.3:0;s=1-c-d}
+      else if(cushion<needs*6){c=.5;d=cheap.length?.3:0;s=1-c-d}
+      else{c=0;d=cheap.length?.5:0;s=1-d}
+      if(c)parts.push(["Подушка безопасности",rest*c,"#FFC400",cushion<needs?"сначала — запас на 1 месяц":"копим до 3–6 месяцев расходов"]);
+      if(d)parts.push(["Досрочное погашение",rest*d,"#FF6B1A",hot.length?"начните с ставки "+Math.max(...hot.map(x=>+x.rate))+"%":"дешёвые кредиты — без спешки"]);
+      if(s>0.001)parts.push(["Цели и мечты",rest*s,"#13A57A","то, ради чего копите"])}}
+  return {st,free,needs,cushion,cg,hot,cheap,grace,parts,spend,mins,debtInPlan,graceShort}}
+function rTips(){const M=tipsModel();
+  $("tipFree").innerHTML='<div class="k">Свободно в месяц</div><div class="v">'+(M.free>0?money(M.free):"0 ₽")+'</div><div class="row3"><div>Доходы<b>'+money(M.st.inc)+'</b></div><div>Платежи'+(M.mins?" и кредиты":"")+'<b>'+money(M.st.fix+M.mins)+'</b></div><div>Траты обычно<b>'+money(M.spend)+'</b></div></div>'+
+    (M.st.inc?"":'<div style="font-size:13px;opacity:.85;margin-top:10px">Заполните «План» — без доходов советы будут неточными.</div>');
+  $("tipSplit").innerHTML='<h3><span>Куда направить свободные деньги</span></h3>'+(M.free>0&&M.parts.length?
+    '<div class="split">'+M.parts.map(p=>'<i style="flex-grow:'+p[1]+';background:'+p[2]+'"></i>').join("")+'</div>'+
+    M.parts.map(p=>'<div class="legrow"><span class="sw2" style="background:'+p[2]+'"></span><div class="t">'+p[0]+'<small>'+p[3]+'</small></div><b>'+money(p[1])+'</b></div>').join("")+
+    (M.graceShort>0?'<div class="alert hot" style="margin:12px 0 0"><div class="e">⚠️</div><div><b>Не хватает '+money(M.graceShort)+' до конца льготного периода</b>Если не погасить кредитку полностью до даты, банк может начислить проценты на всю сумму. Сократите траты в этом месяце или спросите банк о рассрочке.</div></div>':'')+
+    (M.parts.some(p=>p[0]==="Досрочное погашение")?'<button class="btn soft sm" id="applyEx" style="margin-top:12px">Посчитать в «Долгах»</button>':'')
+    :'<div class="m" style="font-size:14px">'+(M.st.inc?"Сейчас после обязательных платежей и обычных трат свободных денег не остаётся. Попробуйте сократить самую большую категорию трат — даже 10% уже дадут запас.":"Заполните доходы и платежи во вкладке «План».")+'</div>');
+  const pct=M.needs>0?Math.min(1,M.cushion/(M.needs*3)):0;
+  $("tipCushion").innerHTML='<h3><span>🛟 Подушка безопасности</span></h3>'+
+    '<div class="m" style="font-size:13.5px;margin:-4px 0 10px">Запас на 3–6 месяцев жизни на случай потери работы или болезни. Хранить отдельно — на накопительном счёте или вкладе.</div>'+
+    (M.needs>0?'<div class="resgrid"><div>Минимум (3 мес.)<b>'+money(M.needs*3)+'</b></div><div>Хорошо (6 мес.)<b>'+money(M.needs*6)+'</b></div></div>'+
+      '<div class="gbar"><i data-w="'+(pct*100)+'%"></i></div><div class="m" style="font-size:13px">'+(M.cg?"Накоплено "+money(M.cushion)+" — это "+(M.needs>0?(M.cushion/M.needs).toFixed(1).replace(".",","):0)+" мес. жизни":"Создайте цель «Подушка безопасности» во вкладке «План» → «Цели», и прогресс появится здесь.")+'</div>'
+      :'<div class="m">Заполните «План», чтобы посчитать нужную сумму.</div>');
+  const L=debtsList();
+  $("tipDebt").innerHTML='<h3><span>💳 Кредиты</span></h3>'+(L.length?(()=>{const dp=M.parts.find(p=>p[0]==="Досрочное погашение");const ex=dp?Math.round(dp[1]/500)*500:0;
+      const base=simulate(0,"avalanche"),s=simulate(ex,"avalanche");const top=[...L].sort((a,b)=>(+b.rate||0)-(+a.rate||0))[0];
+      return '<div class="m" style="font-size:14px;margin-bottom:10px">'+(M.grace.length?"Сначала погасите кредитки в льготный период — это бесплатные деньги, пока срок не истёк. ":"")+'Дальше — <b style="color:var(--ink)">'+esc(top.name)+'</b> ('+top.rate+'%): у него самая высокая ставка, каждый рубль сверх платежа там экономит больше всего.</div>'+
+        (ex&&s&&base&&!s.never?'<div class="resgrid"><div>Если вносить +'+money(ex)+'/мес<b>до '+whenStr(s.end)+'</b></div><div class="good">Экономия на процентах<b>'+money(Math.max(0,base.interest-s.interest))+'</b></div></div>':'')})()
+    :'<div class="m" style="font-size:14px">Кредитов нет — отлично! Если появятся, добавьте их во вкладке «Долги», и здесь появится план погашения.</div>');
+  $("tipRules").innerHTML=[["🧾","Сначала заплатите себе","В день зарплаты сразу отложите 10% — до того, как начнёте тратить."],
+    ["⏳","Льготный период — не ловушка, если платить вовремя","Гасите всю сумму по кредитке до конца льготного периода. Минимальный платёж от процентов не спасает."],
+    ["🏧","Не снимайте наличные с кредитки","Обычно это сразу отменяет льготный период и стоит комиссию 3–5%."],
+    ["🏔","Лишние деньги — в самый дорогой долг","Досрочно гасите кредит с самой высокой ставкой. При досрочном погашении выгоднее уменьшать срок, а не платёж."],
+    ["🔁","Рефинансирование","Если ставка по кредиту заметно выше нынешних — спросите в банке о рефинансировании: это может снизить платёж и переплату."],
+    ["🛟","Подушка важнее вкладов в мечты","Без запаса любая поломка превращается в новый долг. Сначала 1 месяц расходов, потом 3–6."],
+    ["🚫","Не берите новый кредит, чтобы закрыть старый","Кроме рефинансирования под более низкую ставку — иначе долг только растёт."]]
+    .map(r=>'<div class="rule"><div class="e">'+r[0]+'</div><div><b>'+r[1]+'</b><span>'+r[2]+'</span></div></div>').join("")+
+    '<div class="m" style="font-size:12px;margin-top:10px">Это общие рекомендации, а не персональная финансовая консультация.</div>';
+  grow($("tipCushion"));
+  const ap=$("applyEx");if(ap)ap.onclick=()=>{const dp=M.parts.find(p=>p[0]==="Досрочное погашение");$("exRange").value=String(Math.min(50000,Math.round(dp[1]/500)*500));go(2);rDebts()}}
+
 // toast
 let tt=null;
 function toast(msg,undo){const t=$("toast");t.innerHTML="<span>"+esc(msg)+"</span>"+(undo?'<button id="undoB">Вернуть</button>':"");
@@ -1467,7 +1917,7 @@ function toast(msg,undo){const t=$("toast");t.innerHTML="<span>"+esc(msg)+"</spa
 
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)render()});
 addEventListener("resize",()=>go(vi));
-seg("spendRange","r","day");go(0);render();
+seg("spendRange","r","day");seg("spendMode","sm","list");seg("chartRange","r","week");seg("stratSeg","st","avalanche");go(0);render();
 })();
 </script>
 </body>
