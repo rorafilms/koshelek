@@ -1265,7 +1265,7 @@ function opRow(o,n){
   const cb=o.card?'<span class="cbadge">'+ico("card")+esc(cardShort(o.card).slice(-4))+'</span>':"";
   return '<div class="sw" '+(o.inc?'data-iid':'data-sid')+'="'+o.it.id+'" data-m="'+o.m+'"><div class="sw-bg" '+(o.inc?"data-delin":"data-delsp")+'>Удалить</div>'+
     '<div class="row op'+nw(o.it.id)+'" data-op="'+o.k+':'+o.m+':'+o.it.id+'" style="--d:'+(n||0)+'">'+mono(o.inc?o.title:o.it.note,o.cat)+
-    '<div class="t"><div class="n">'+esc(o.title)+'</div><div class="d"><span>'+esc(o.sub)+'</span>'+cb+'</div></div>'+
+    '<div class="t"><div class="n">'+esc(o.title)+'</div><div class="d"><span>'+esc(o.sub)+'</span>'+cb+(o.it.source==="sms"?'<span style="font-size:11px;color:var(--muted)">из SMS</span>':"")+'</div></div>'+
     '<div class="r"><div class="amt'+(o.inc?" g":"")+'">'+(o.inc?"+":"−")+money(o.amount)+'</div>'+(o.time?'<div class="tm">'+o.time+'</div>':'')+'</div></div></div>'}
 function itemRow(i,mk,n){return opRow(opOf("s",mk,i),n)}
 function emptyBox(icon,title,text,btn){return '<div class="emptyx"><div class="eic">'+tgi(icon,"orange")+'</div><b>'+esc(title)+'</b><span>'+esc(text)+'</span>'+(btn||"")+'</div>'}
