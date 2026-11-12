@@ -2040,8 +2040,6 @@ function mono(name,cat,cls){const c=CAT[cat]||CAT.other;const b=brandOf(name);
   const domain=BRAND_DOMAINS[b.name];
   const img=domain?'<img class="brand-logo" src="https://www.google.com/s2/favicons?domain='+domain+'&sz=128" alt="" loading="lazy" decoding="async" onerror="this.remove()">':'';
   return '<span class="gi mono'+(cls?" "+cls:"")+'" style="--g1:'+c[4]+';--g2:'+c[3]+'"><b>'+esc(initials(b.name))+'</b>'+img+'</span>'}
-  if(!b)return cgi(cat,cls);
-  return '<span class="gi mono'+(cls?" "+cls:"")+'" style="--g1:'+c[4]+';--g2:'+c[3]+'"><b>'+esc(initials(b.name))+'</b></span>'}
 
 // ================= КАРТЫ: карусель =================
 const CARD_COLORS=["orange","navy","green","yellow","violet","red"];
