@@ -11,8 +11,14 @@ concurrency:
   group: deploy-yandex
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
+  checks:
+    uses: ./.github/workflows/check.yml
   deploy:
+    needs: checks
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -42,6 +48,6 @@ jobs:
           }
           for f in *.png; do up "$f" "image/png" "public,max-age=604800"; done
           up manifest.webmanifest "application/manifest+json" "no-cache"
-          up sw.js "text/javascript; charset=utf-8" "no-cache"
           up index.html "text/html; charset=utf-8" "no-cache"
+          up sw.js "text/javascript; charset=utf-8" "no-cache"
           echo "Готово: https://koshelek.website.yandexcloud.net"
